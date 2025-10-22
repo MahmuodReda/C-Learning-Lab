@@ -1,23 +1,37 @@
-#include <iostream> // Include the standard input/output library
+#include <iostream>   // Include the standard input/output library
+#include <iomanip>    // Include the I/O manipulators library for formatting
+
+// using namespace std;
 
 int main() {
-    int number; // Declare an integer variable to store user input
+    int num1 = 42;
 
-    // Prompt the user to enter a number
-    std::cout << "Please enter a number: ";
-    std::cin >> number; // Read the number from user input
+    // Print number with a width of 6 characters (right-aligned by default)
+    std::cout << "Number: " << setw(6) << num1 << std::endl;
 
-    // Display the entered number
-    std::cout << "You entered: " << number << std::endl;
+    double pi = 3.1415926535;
 
-    // Display the number doubled
-    std::cout << "Doubled: " << number * 2 << std::endl;
+    // Print pi with 4 digits of precision
+    std::cout << "Pi: " << setprecision(4) << pi << std::endl;
 
-    // Display the number tripled
-    std::cout << "Tripled: " << number * 3 << std::endl;
+    double num2 = 123.456789;
 
-    // Display the number halved (integer division)
-    std::cout << "Halved: " << number / 2 << std::endl;
+    // Print number in scientific notation
+    std::cout << "Sci: " << scientific << num2 << std::endl;
 
-    return 0; // Exit the program
+    int num3 = 42;
+
+    // Print number in hexadecimal format
+    std::cout << "Hex: " << hex << num3 << std::endl;
+
+    // Print number in octal format
+    std::cout << "Oct: " << oct << num3 << std::endl;
+
+    // Print number in decimal format
+    std::cout << "Dec: " << dec << num3 << std::endl;
+
+    // Print number in hexadecimal format with base prefix (e.g., 0x2a)
+    std::cout << hex << showbase << num3 << std::endl;
+
+    return 0;
 }
