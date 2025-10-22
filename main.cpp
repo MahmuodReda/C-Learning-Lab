@@ -1,37 +1,50 @@
 #include <iostream>   // Include the standard input/output library
 #include <iomanip>    // Include the I/O manipulators library for formatting
 
-// using namespace std;
+using namespace std;
 
 int main() {
-    int num1 = 42;
+    // Declare variables used in arithmetic and comparison
+    int a = 10, b = 3;
 
-    // Print number with a width of 6 characters (right-aligned by default)
-    std::cout << "Number: " << setw(6) << num1 << std::endl;
+    // Arithmetic Operators
+    std::cout << "a + b = " << a + b << std::endl;
+    std::cout << "a - b = " << a - b << std::endl;
+    std::cout << "a * b = " << a * b << std::endl;
+    std::cout << "a / b = " << a / b << std::endl;
+    std::cout << "a % b = " << a % b << std::endl;
 
-    double pi = 3.1415926535;
+    // Comparison Operators
+    std::cout << "\nComparison Operators: " << std::endl;
+    std::cout << "a == b: " << (a == b) << std::endl;
+    std::cout << "a != b: " << (a != b) << std::endl;
+    std::cout << "a > b: " << (a > b) << std::endl;
+    std::cout << "a < b: " << (a < b) << std::endl;
+    std::cout << "a >= b: " << (a >= b) << std::endl;
+    std::cout << "a <= b: " << (a <= b) << std::endl;
 
-    // Print pi with 4 digits of precision
-    std::cout << "Pi: " << setprecision(4) << pi << std::endl;
+    // Logical Operators
+    bool x = true, y = false;
+    std::cout << "\nLogical Operators: " << std::endl;
+    std::cout << "x && y: " << (x && y) << std::endl;
+    std::cout << "x || y: " << (x || y) << std::endl;
+    std::cout << "!x: " << (!x) << std::endl;
 
-    double num2 = 123.456789;
+    // Bitwise Operators
+    unsigned int num1 = 5, num2 = 3;
+    std::cout << "\nBitwise Operators: " << std::endl;
+    std::cout << "num1 & num2: " << (num1 & num2) << std::endl;
+    std::cout << "num1 | num2: " << (num1 | num2) << std::endl;
+    std::cout << "num1 ^ num2: " << (num1 ^ num2) << std::endl;
+    std::cout << "~num1: " << (~num1) << std::endl;
+    std::cout << "num1 << 1: " << (num1 << 1) << std::endl;
+    std::cout << "num1 >> 1: " << (num1 >> 1) << std::endl;
 
-    // Print number in scientific notation
-    std::cout << "Sci: " << scientific << num2 << std::endl;
-
-    int num3 = 42;
-
-    // Print number in hexadecimal format
-    std::cout << "Hex: " << hex << num3 << std::endl;
-
-    // Print number in octal format
-    std::cout << "Oct: " << oct << num3 << std::endl;
-
-    // Print number in decimal format
-    std::cout << "Dec: " << dec << num3 << std::endl;
-
-    // Print number in hexadecimal format with base prefix (e.g., 0x2a)
-    std::cout << hex << showbase << num3 << std::endl;
+    // Assignment Operators
+    int c = 2;
+    std::cout << "\nAssignment Operators: " << std::endl;
+    std::cout << "c = 3: " << (c = 3) << std::endl;
+    std::cout << "c += 2: " << (c += 2) << std::endl;
 
     return 0;
 }
