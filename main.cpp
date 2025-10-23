@@ -1,50 +1,43 @@
-#include <iostream>   // Include the standard input/output library
-#include <iomanip>    // Include the I/O manipulators library for formatting
+#include <iostream> // For input/output
 
-using namespace std;
 
 int main() {
-    // Declare variables used in arithmetic and comparison
-    int a = 10, b = 3;
+    int number;
+    int option;
 
-    // Arithmetic Operators
-    std::cout << "a + b = " << a + b << std::endl;
-    std::cout << "a - b = " << a - b << std::endl;
-    std::cout << "a * b = " << a * b << std::endl;
-    std::cout << "a / b = " << a / b << std::endl;
-    std::cout << "a % b = " << a % b << std::endl;
+    // ======= Part 1: Using if-else =======
+    std::cout << "Enter a number: ";
+    std::cin >> number;
 
-    // Comparison Operators
-    std::cout << "\nComparison Operators: " << std::endl;
-    std::cout << "a == b: " << (a == b) << std::endl;
-    std::cout << "a != b: " << (a != b) << std::endl;
-    std::cout << "a > b: " << (a > b) << std::endl;
-    std::cout << "a < b: " << (a < b) << std::endl;
-    std::cout << "a >= b: " << (a >= b) << std::endl;
-    std::cout << "a <= b: " << (a <= b) << std::endl;
+    // Check if the number is even or odd using if-else
+    if (number % 2 == 0) {
+        std::cout << "Using if-else: The number is even." << std::endl;
+    } else {
+        std::cout << "Using if-else: The number is odd." << std::endl;
+    }
 
-    // Logical Operators
-    bool x = true, y = false;
-    std::cout << "\nLogical Operators: " << std::endl;
-    std::cout << "x && y: " << (x && y) << std::endl;
-    std::cout << "x || y: " << (x || y) << std::endl;
-    std::cout << "!x: " << (!x) << std::endl;
+    // ======= Part 2: Using switch =======
+    std::cout << "\nChoose an option:\n";
+    std::cout << "1 - Print square of the number\n";
+    std::cout << "2 - Print cube of the number\n";
+    std::cout << "3 - Print double of the number\n";
+    std::cout << "Enter your choice: ";
+    std::cin >> option;
 
-    // Bitwise Operators
-    unsigned int num1 = 5, num2 = 3;
-    std::cout << "\nBitwise Operators: " << std::endl;
-    std::cout << "num1 & num2: " << (num1 & num2) << std::endl;
-    std::cout << "num1 | num2: " << (num1 | num2) << std::endl;
-    std::cout << "num1 ^ num2: " << (num1 ^ num2) << std::endl;
-    std::cout << "~num1: " << (~num1) << std::endl;
-    std::cout << "num1 << 1: " << (num1 << 1) << std::endl;
-    std::cout << "num1 >> 1: " << (num1 >> 1) << std::endl;
-
-    // Assignment Operators
-    int c = 2;
-    std::cout << "\nAssignment Operators: " << std::endl;
-    std::cout << "c = 3: " << (c = 3) << std::endl;
-    std::cout << "c += 2: " << (c += 2) << std::endl;
+    // Perform operation based on user's choice using switch
+    switch (option) {
+        case 1:
+            std::cout << "Using switch: Square = " << number * number << std::endl;
+            break;
+        case 2:
+            std::cout << "Using switch: Cube = " << number * number * number << std::endl;
+            break;
+        case 3:
+            std::cout << "Using switch: Double = " << number * 2 << std::endl;
+            break;
+        default:
+            std::cout << "Using switch: Invalid option selected." << std::endl;
+    }
 
     return 0;
 }
