@@ -1,33 +1,34 @@
 #include <iostream>  // For input/output
-#include <string>    // For std::to_string
+#include <bitset>    // For binary conversion
+#include <string>    // For string input
 
 /**
- * @brief Calculates and prints the sum of digits of a user-entered integer.
+ * @brief Converts a decimal number to binary and a binary string to decimal.
  */
-void sumDigitsOfInteger() {
-    int number;
+void convertDecimalBinary() {
+    int decimal;
+    std::string binary;
 
-    // Ask the user to enter an integer
-    std::cout << "Enter a number: ";
-    std::cin >> number;
+    // Convert decimal to binary
+    std::cout << "Enter a decimal number: ";
+    std::cin >> decimal;
 
-    // Convert the integer to a string
-    std::string number_str = std::to_string(number);
+    std::bitset<8> binaryRep(decimal); // 8-bit representation
+    std::cout << "Decimal number: " << decimal << std::endl;
+    std::cout << "Binary representation: " << binaryRep << std::endl;
 
-    // Calculate the sum of digits using string manipulation
-    int sum = 0;
-    for (char digit : number_str) {
-        sum += digit - '0'; // Convert character to integer
-    }
+    // Convert binary to decimal
+    std::cout << "Enter a binary number: ";
+    std::cin >> binary;
 
-    // Output the result
-    std::cout << "Sum of digits = " << sum << std::endl;
+    int decimalRep = std::stoi(binary, nullptr, 2); // Convert base-2 string to int
+    std::cout << "Decimal representation: " << decimalRep << std::endl;
 }
 
 /**
  * @brief Main function that starts the program.
  */
 int main() {
-    sumDigitsOfInteger(); // Call the function to calculate digit sum
+    convertDecimalBinary(); // Call the function to perform conversions
     return 0;
 }
