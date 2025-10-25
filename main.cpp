@@ -1,42 +1,34 @@
 #include <iostream> // For input/output
 
-// Declare three global integer variables to store user input
-int a = 0, b = 0, c = 0;
+// Declare global variables for row control
+int totalRows = 0;
+int currentRow = 0;
+int starCount = 0;
 
 /**
- * @brief Finds and prints the maximum number among three user-entered values.
+ * @brief Prints a right-angled triangle pattern using asterisks (*).
+ *        The height of the triangle is entered by the user.
  */
-void findMaxOfThree() {
-    // Ask the user to enter three numbers
-    std::cout << "Enter first number: ";
-    std::cin >> a;
+void printRightAngleTriangle() {
+    // Ask the user to enter the number of rows (height of triangle)
+    std::cout << "Enter the number of rows: ";
+    std::cin >> totalRows;
 
-    std::cout << "Enter second number: ";
-    std::cin >> b;
-
-    std::cout << "Enter third number: ";
-    std::cin >> c;
-
-    // Compare the three numbers to determine the largest
-    if (a > b && a > c) {
-        std::cout << "The largest number is: " << a << std::endl;
-    } 
-    else if (b > a && b > c) {
-        std::cout << "The largest number is: " << b << std::endl;
-    } 
-    else if (c > a && c > b) {
-        std::cout << "The largest number is: " << c << std::endl;
-    } 
-    else {
-        // If no single number is strictly greater, then at least two are equal
-        std::cout << "There is no single largest number (some numbers may be equal)." << std::endl;
-    }     
+    // Outer loop: controls the number of rows
+    for (currentRow = 0; currentRow < totalRows; currentRow++) {
+        // Inner loop: prints stars in each row
+        for (starCount = 0; starCount <= currentRow; starCount++) {
+            std::cout << "*";
+        }
+        // Move to the next line after each row
+        std::cout << std::endl;
+    }
 }
 
 /**
  * @brief Main function that starts the program.
  */
 int main() {
-    findMaxOfThree(); // Call the function to find and print the maximum
+    printRightAngleTriangle(); // Call the function to print the triangle
     return 0;
 }
