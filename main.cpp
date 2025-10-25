@@ -1,27 +1,31 @@
 #include <iostream> // For input/output
-
-// Declare global variables for row control
-int totalRows = 0;
-int currentRow = 0;
-int starCount = 0;
+#include <cctype>   // For tolower()
 
 /**
- * @brief Prints a right-angled triangle pattern using asterisks (*).
- *        The height of the triangle is entered by the user.
+ * @brief Checks whether a given character is a vowel or not.
  */
-void printRightAngleTriangle() {
-    // Ask the user to enter the number of rows (height of triangle)
-    std::cout << "Enter the number of rows: ";
-    std::cin >> totalRows;
+void checkIfVowel() {
+    char letter;
 
-    // Outer loop: controls the number of rows
-    for (currentRow = 0; currentRow < totalRows; currentRow++) {
-        // Inner loop: prints stars in each row
-        for (starCount = 0; starCount <= currentRow; starCount++) {
-            std::cout << "*";
-        }
-        // Move to the next line after each row
-        std::cout << std::endl;
+    // Ask the user to enter a letter
+    std::cout << "Enter a letter: ";
+    std::cin >> letter;
+
+    // Validate that the input is an alphabetic character
+    if (letter >= 'A' && letter <= 'Z' || letter >= 'a' && letter <= 'z') {
+        // Convert to lowercase to simplify comparison
+        letter = std::tolower(letter);
+    } else {
+        // If input is not a letter, show error and exit
+        std::cout << "Invalid input. Please enter an alphabetic character." << std::endl;
+        return;
+    }
+
+    // Check if the letter is a vowel
+    if (letter == 'a' || letter == 'e' || letter == 'i' || letter == 'o' || letter == 'u') {
+        std::cout << "The letter '" << letter << "' is a vowel." << std::endl;
+    } else {
+        std::cout << "The letter '" << letter << "' is not a vowel." << std::endl;
     }
 }
 
@@ -29,6 +33,6 @@ void printRightAngleTriangle() {
  * @brief Main function that starts the program.
  */
 int main() {
-    printRightAngleTriangle(); // Call the function to print the triangle
+    checkIfVowel(); // Call the function to check for vowel
     return 0;
 }
