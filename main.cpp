@@ -1,46 +1,37 @@
 /**
- * @file overloaded_multiplication.cpp
- * @brief Demonstrates function overloading using int and float parameters.
+ * @file null_vs_nullptr.cpp
+ * @brief Demonstrates the difference between NULL and nullptr in function overloading.
  */
 
 #include <iostream>
 
-// Global variable to store the result
-float result = 0;
-
 /**
- * @brief Multiplies two integers.
- * @param a First integer
- * @param b Second integer
- * @return Product of a and b
+ * @brief Called when an integer is passed.
+ * @param x Integer value
  */
-float multiply(int a, int b) {
-    std::cout << "[int version called]\n";
-    return a * b;
+void identify(int x) {
+    std::cout << "Called identify(int)\n";
 }
 
 /**
- * @brief Multiplies two floating-point numbers.
- * @param x First float
- * @param y Second float
- * @return Product of x and y
+ * @brief Called when a pointer to int is passed.
+ * @param x Pointer to int
  */
-float multiply(float x, float y) {
-    std::cout << "[float version called]\n";
-    return x * y;
+void identify(int* x) {
+    std::cout << "Called identify(int*)\n";
 }
-
-/**
- * @brief Main function to test overloaded multiply functions.
- */
 int main() {
-    // Call the integer version
-    result = multiply(2, 3);
-    std::cout << "Result (int): " << result << "\n";
+    // Ambiguous: NULL is treated as 0 (int), not a pointer
+    identify(NULL);      // Warning: passing NULL to int
 
-    // Call the float version
-    result = multiply(1.6f, 2.1f);
-    std::cout << "Result (float): " << result << "\n";
-
+    // Clear: nullptr is a null pointer → calls pointer version
+    identify(nullptr);   // No warning
     return 0;
 }
+
+// main.cpp: In function 'int main()':
+// main.cpp:25:18: warning: passing NULL to non-pointer argument 1 of 'void identify(int)' [-Wconversion-null]
+//      identify(NULL);      // Warning: passing NULL to int
+//                   ^
+// Called identify(int)
+// Called identify(int*)
