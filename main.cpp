@@ -1,64 +1,32 @@
 #include <iostream>
-#include <typeinfo>
-#include <initializer_list>
 
 int main() {
-    auto a = 42;                  // int
-    auto b = 3.14;                // double
-    auto c = 'x';                 // char
-    auto d = "hello";            // const char*
-    auto e = std::string("hi");  // std::string
+    const int val = 10;               // Original constant value
+    const int* ptr = &val;            // Pointer to const int
 
-    int x = 10;
-    int& rx = x;
-    const int& crx = x;
+    // Memory illustration (conceptual):
+    // 0x01 -> val [10]   // actual memory address of val
+    // 0x050 -> ptr [0x01] // ptr points to address of val
 
-    auto f = rx;                 // int (copy)
-    auto g = crx;                // int (copy)
-    auto& h = crx;               // const int& (preserves reference)
+    // Unsafe cast: remove const qualifier
+    // int* ptr2 = ptr;   //  Invalid: discards const qualifier
+    int* ptr2 = const_cast<int*>(ptr); //  Legal but dangerous
 
-    auto p = &x;                 // int*
-    auto q = &crx;               // const int*
+    // Modify value through non-const pointer
+    *ptr2 = 100; //  Undefined behavior: modifying a const object
 
-
-    // Print deduced types using typeid
-    std::cout << "a: " << typeid(a).name() << "\n";
-    std::cout << "b: " << typeid(b).name() << "\n";
-    std::cout << "c: " << typeid(c).name() << "\n";
-    std::cout << "d: " << typeid(d).name() << "\n";
-    std::cout << "e: " << typeid(e).name() << "\n";
-    std::cout << "f: " << typeid(f).name() << "\n";
-    std::cout << "g: " << typeid(g).name() << "\n";
-    std::cout << "h: " << typeid(h).name() << "\n";
-    std::cout << "p: " << typeid(p).name() << "\n";
-    std::cout << "q: " << typeid(q).name() << "\n";
-
+    // Print addresses and values
+    std::cout << "Address of val   : " << &val << "\n";
+    std::cout << "Address in ptr   : " << ptr << "\n";
+    std::cout << "Address in ptr2  : " << ptr2 << "\n";
+    std::cout << "Value via ptr2   : " << *ptr2 << "\n";
+    std::cout << "Value of val     : " << val << "\n";
 
     return 0;
 }
 
-/*
-| Expression         | Deduced Type               | Notes                            |
-|--------------------|----------------------------|----------------------------------|
-| auto a = 42;       | int                        | Integer literal                  |
-| auto b = 3.14;     | double                     | Floating-point literal           |
-| auto c = 'x';      | char                       | Character literal                |
-| auto d = "hello";  | const char*                | String literal                   |
-| auto e = string    | std::string                | Explicit string object           |
-| auto f = rx;       | int                        | Reference dropped (copy)         |
-| auto g = crx;      | int                        | Const reference dropped (copy)   |
-| auto& h = crx;     | const int&                 | Reference preserved              |
-| auto p = &x;       | int*                       | Pointer to int                   |
-| auto q = &crx;     | const int*                 | Pointer to const int             |
-*/
-
-// a: i
-// b: d
-// c: c
-// d: PKc
-// e: NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
-// f: i
-// g: i
-// h: i
-// p: Pi
-// q: PKi
+// Address of val   : 0x9f3b7ffd1c
+// Address in ptr   : 0x9f3b7ffd1c
+// Address in ptr2  : 0x9f3b7ffd1c
+// Value via ptr2   : 100
+// Value of val     : 10
