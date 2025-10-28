@@ -1,56 +1,64 @@
 #include <iostream>
-
-// Regular function: works on a copy
-void addTen(int x) {
-    x += 10;
-    std::cout << "Inside addTen (copy): x = " << x << "\n";
-}
-
-// Simulated method: works on original via reference
-void addTenRef(int& x) {
-    x += 10;
-    std::cout << "Inside addTenRef (reference): x = " << x << "\n";
-}
-
-// Simulated method: works on original via pointer
-void addTenPtr(int* x) {
-    *x += 10;
-    std::cout << "Inside addTenPtr (pointer): *x = " << *x << "\n";
-}
+#include <typeinfo>
+#include <initializer_list>
 
 int main() {
-    int value = 5;
+    auto a = 42;                  // int
+    auto b = 3.14;                // double
+    auto c = 'x';                 // char
+    auto d = "hello";            // const char*
+    auto e = std::string("hi");  // std::string
 
-    // Call regular function (copy)
-    addTen(value);
-    std::cout << "After addTen: value = " << value << "\n";
+    int x = 10;
+    int& rx = x;
+    const int& crx = x;
 
-    // Call reference-based function
-    addTenRef(value);
-    std::cout << "After addTenRef: value = " << value << "\n";
+    auto f = rx;                 // int (copy)
+    auto g = crx;                // int (copy)
+    auto& h = crx;               // const int& (preserves reference)
 
-    int value2 = 5;
-    // Call pointer-based function
-    addTenPtr(&value2);
-    std::cout << "After addTenPtr: value2 = " << value2 << "\n";
+    auto p = &x;                 // int*
+    auto q = &crx;               // const int*
+
+
+    // Print deduced types using typeid
+    std::cout << "a: " << typeid(a).name() << "\n";
+    std::cout << "b: " << typeid(b).name() << "\n";
+    std::cout << "c: " << typeid(c).name() << "\n";
+    std::cout << "d: " << typeid(d).name() << "\n";
+    std::cout << "e: " << typeid(e).name() << "\n";
+    std::cout << "f: " << typeid(f).name() << "\n";
+    std::cout << "g: " << typeid(g).name() << "\n";
+    std::cout << "h: " << typeid(h).name() << "\n";
+    std::cout << "p: " << typeid(p).name() << "\n";
+    std::cout << "q: " << typeid(q).name() << "\n";
+
 
     return 0;
 }
 
 /*
-| Feature              | Pass by Reference (int&) | Pass by Pointer (int*) |
-|----------------------|---------------------------|--------------------------|
-| Syntax               | addTenRef(x)              | addTenPtr(&x)            |
-| Can be null?         | No                        | Yes                      |
-| Needs dereferencing? | No                        | Yes (*)                  |
-| Safety               | Safer                     | Requires null check      |
-| Use case             | Direct access             | Flexible, dynamic access |
+| Expression         | Deduced Type               | Notes                            |
+|--------------------|----------------------------|----------------------------------|
+| auto a = 42;       | int                        | Integer literal                  |
+| auto b = 3.14;     | double                     | Floating-point literal           |
+| auto c = 'x';      | char                       | Character literal                |
+| auto d = "hello";  | const char*                | String literal                   |
+| auto e = string    | std::string                | Explicit string object           |
+| auto f = rx;       | int                        | Reference dropped (copy)         |
+| auto g = crx;      | int                        | Const reference dropped (copy)   |
+| auto& h = crx;     | const int&                 | Reference preserved              |
+| auto p = &x;       | int*                       | Pointer to int                   |
+| auto q = &crx;     | const int*                 | Pointer to const int             |
 */
 
-
-// Inside addTen (copy): x = 15
-// After addTen: value = 5
-// Inside addTenRef (reference): x = 15
-// After addTenRef: value = 15
-// Inside addTenPtr (pointer): *x = 15
-// After addTenPtr: value2 = 15
+// a: i
+// b: d
+// c: c
+// d: PKc
+// e: NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+// f: i
+// g: i
+// h: i
+// p: Pi
+// q: PKi
