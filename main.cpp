@@ -1,48 +1,73 @@
+/**
+ * @file const_constexpr_define_examples.cpp
+ * @brief Demonstrates the difference between const, constexpr, and #define
+ *        when applied to variables and functions (no classes used).
+ */
+
 #include <iostream>
 using namespace std;
 
-int main() {
-    // Case 1: Local variable inside the lambda body
-    // 's' is declared inside the lambda, so a new 's' is created each time the lambda runs
-    auto add1 = [](int a, int b) {
-        int s = 10;  // Local variable, recreated for each call
-        s++;         // Increment s
-        return a + b + s;  // Return result using local s
-    };
+//--------------------------------------------
+// Example of #define (text substitution)
+//--------------------------------------------
+#define PI 3.1415926535                 ///< Macro constant (no type checking)
+#define SQUARE(x) ((x) * (x))           ///< Macro function (expanded as text)
 
-    // Case 2: Captured variable with an initialized value
-    // 's' is captured and stored in the lambda object itself
-    // 'mutable' allows modification of this internal copy
-    auto add2 = [s = 10](int a, int b) mutable {
-        s++;         // Modify the captured 's'
-        return a + b + s;  // Return result using modified s
-    };
-
-    // Each call to add1 starts with a fresh 's' = 10
-    cout << "add1 call 1: " << add1(1, 1) << endl; // s = 10 → 11 → result = 13
-    cout << "add1 call 2: " << add1(1, 1) << endl; // new s again = 10 → 11 → result = 13
-
-    cout << "_________________________________________________" << endl;
-    // Each call to add2 uses the same lambda instance,
-    // so 's' keeps its modified value between calls
-    cout << "add2 call 1: " << add2(1, 1) << endl; // s = 10 → 11 → result = 13
-    cout << "add2 call 2: " << add2(1, 1) << endl; // s = 11 → 12 → result = 14
-    
-    cout << "add2 call 1: " << add2(1, 1) << endl; 
-    cout << "add2 call 2: " << add2(1, 1) << endl; 
-
+//--------------------------------------------
+// Example of constexpr function
+//--------------------------------------------
+constexpr int add(int a, int b) {       ///< Compile-time addition
+    return a + b;
 }
 
-/*
-- Shows how a local variable inside a lambda is recreated per call.
-- Demonstrates how captured 's' with 'mutable' persists its value across calls.
-- Useful for understanding lambda object state in C++.
-*/
+//--------------------------------------------
+// Example of const variable and const parameter
+//--------------------------------------------
+void printConst(const int value) {      ///< Function parameter marked const → read-only
+    cout << "Constant value: " << value << endl;
+}
 
-// add1 call 1: 13
-// add1 call 2: 13
-// _________________________________________________
-// add2 call 1: 13
-// add2 call 2: 14
-// add2 call 1: 15
-// add2 call 2: 16
+//--------------------------------------------
+// Example using all of them together
+//--------------------------------------------
+int main() {
+    // const variable: runtime constant (value cannot be changed)
+    const int maxValue = 10;            ///< Constant known at runtime
+
+    // constexpr variable: compile-time constant
+    constexpr int baseValue = 5;        ///< Constant known at compile-time
+
+    // Compute using constexpr function (evaluated at compile-time)
+    constexpr int sum = add(baseValue, 3);
+
+    // Use #define macro to calculate area of a circle
+    double radius = 2.0;
+    double circleArea = PI * SQUARE(radius);  ///< Macro substitution: ((radius)*(radius))
+
+    // Use const variable in runtime computation
+    int scaled = maxValue * sum;        ///< Computed at runtime
+
+    // Print results
+    printConst(sum);
+    printConst(scaled);
+    cout << "Circle area using PI macro: " << circleArea << endl;
+
+    //--------------------------------------------
+    // Difference demonstration
+    //--------------------------------------------
+    // #define → text replacement, no scope, no type
+    // const → runtime constant, has type and scope
+    // constexpr → compile-time constant, faster and safer
+    //--------------------------------------------
+
+
+    return 0;
+}
+
+/**
+ * @note
+ *  - #define performs simple text substitution before compilation.
+ *  - const guarantees immutability at runtime.
+ *  - constexpr ensures compile-time evaluation for optimization.
+ */
+
