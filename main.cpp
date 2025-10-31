@@ -1,73 +1,61 @@
-/**
- * @file const_constexpr_define_examples.cpp
- * @brief Demonstrates the difference between const, constexpr, and #define
- *        when applied to variables and functions (no classes used).
- */
-
 #include <iostream>
-using namespace std;
+#include <vector>
+#include <algorithm>
 
-//--------------------------------------------
-// Example of #define (text substitution)
-//--------------------------------------------
-#define PI 3.1415926535                 ///< Macro constant (no type checking)
-#define SQUARE(x) ((x) * (x))           ///< Macro function (expanded as text)
-
-//--------------------------------------------
-// Example of constexpr function
-//--------------------------------------------
-constexpr int add(int a, int b) {       ///< Compile-time addition
-    return a + b;
-}
-
-//--------------------------------------------
-// Example of const variable and const parameter
-//--------------------------------------------
-void printConst(const int value) {      ///< Function parameter marked const → read-only
-    cout << "Constant value: " << value << endl;
-}
-
-//--------------------------------------------
-// Example using all of them together
-//--------------------------------------------
+/**
+ * @brief Find the maximum element in an array using lambda and sorting.
+ * @details The array is sorted in ascending order with a lambda comparator.
+ * The last element after sorting is the maximum value.
+ */
 int main() {
-    // const variable: runtime constant (value cannot be changed)
-    const int maxValue = 10;            ///< Constant known at runtime
+    int n;
+    std::cout << "n=" ;
 
-    // constexpr variable: compile-time constant
-    constexpr int baseValue = 5;        ///< Constant known at compile-time
+    std::cin >> n;
+    if (n == 0 || n > 20)
+    {
+          std::cout << " Error " << std::endl;
+          return 0;
+    }
 
-    // Compute using constexpr function (evaluated at compile-time)
-    constexpr int sum = add(baseValue, 3);
+    std::vector<int> arr(n);
 
-    // Use #define macro to calculate area of a circle
-    double radius = 2.0;
-    double circleArea = PI * SQUARE(radius);  ///< Macro substitution: ((radius)*(radius))
+    std::cout << " Input array elements " << std::endl;
+    // Input array elements from user
+    for (size_t i = 0; i < n; i++) {
+        std::cin >> arr[i];
+    }
 
-    // Use const variable in runtime computation
-    int scaled = maxValue * sum;        ///< Computed at runtime
+    std::cout << "Finding the maximum element in the array." << std::endl;
 
-    // Print results
-    printConst(sum);
-    printConst(scaled);
-    cout << "Circle area using PI macro: " << circleArea << endl;
+    // Sort array using lambda comparator (ascending order)
+    std::sort(arr.begin(), arr.end(), [](int a, int b) {
+        return a < b;
+    });
 
-    //--------------------------------------------
-    // Difference demonstration
-    //--------------------------------------------
-    // #define → text replacement, no scope, no type
-    // const → runtime constant, has type and scope
-    // constexpr → compile-time constant, faster and safer
-    //--------------------------------------------
+    // Print the sorted array
+    for (int val : arr) {
+        std::cout << val << " ";
+    }
 
+    std::cout << std::endl;
+    std::cout << "Maximum element: " << arr.back() << std::endl;
 
     return 0;
 }
 
-/**
- * @note
- *  - #define performs simple text substitution before compilation.
- *  - const guarantees immutability at runtime.
- *  - constexpr ensures compile-time evaluation for optimization.
- */
-
+// n=10
+//  Input array elements 
+// 5
+// 3
+// 2
+// 1
+// 45
+// 6
+// 5
+// 48
+// 48
+// 5
+// Finding the maximum element in the array.
+// 1 2 3 5 5 5 6 45 48 48
+// Maximum element: 48
