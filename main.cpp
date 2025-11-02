@@ -1,58 +1,104 @@
+/**
+ * @file enum_example.cpp
+ * @brief Demonstrates the difference between enum and enum class in C++,
+ *        including how to print their names and numeric values.
+ */
+
 #include <iostream>
-using namespace std;
+#include <string>
 
-// ======= Global & Static Variables =======
-int globalA = 5;             // Static initialization (known at compile time)
-int globalB = globalA + 5;   // Dynamic initialization (evaluated at runtime)
+// ============================================================================
+// Traditional enum (old-style)
+// ============================================================================
 
-// ======= Function for dynamic init =======
-int calcValue() {
-    cout << "calcValue() called\n";
-    return 42;
+enum Color {
+    Red,      // Implicitly assigned 0
+    Green,    // Implicitly assigned 1
+    Blue      // Implicitly assigned 2
+};
+
+// ============================================================================
+// Modern enum class (strongly-typed enum)
+// ============================================================================
+
+enum class Direction {
+    North,    // 0
+    East,     // 1
+    South,    // 2
+    West      // 3
+};
+
+// ============================================================================
+// Function to convert enum class 'Direction' to string
+// ============================================================================
+
+std::string toString(Direction dir) {
+    switch (dir) {
+        case Direction::North: return "North";
+        case Direction::East:  return "East";
+        case Direction::South: return "South";
+        case Direction::West:  return "West";
+        default:               return "Unknown";
+    }
 }
 
-// ======= Main Function =======
+// ============================================================================
+// Optional: Overload operator<< to allow direct printing of Direction values
+// ============================================================================
+// std::ostream& operator<<(std::ostream& os, Direction dir) {
+//     return os << toString(dir);
+// }
+
+// ============================================================================
+// Main Function
+// ============================================================================
+
 int main() {
-    cout << "=== Demonstrating All Initialization Types ===\n";
+    // ---------------------------------------------------------------
+    // Example 1: Using traditional enum
+    // ---------------------------------------------------------------
+    Color c = Green;
 
-    // 1. Default initialization
-    int a; // Uninitialized - contains garbage value
-    cout << "Default-initialized a = " << a << " (undefined)\n";
+    std::cout << "=== Traditional enum ===" << std::endl;
+    std::cout << "Color (numeric): " << c << std::endl;  // Prints 1
+    // We can compare directly because old enums convert to int implicitly
+    if (c == Green) {
+        std::cout << "Color is Green" << std::endl;
+    }
 
-    // 2. Copy initialization
-    int b = 10;
-    cout << "Copy-initialized b = " << b << "\n";
+    // ---------------------------------------------------------------
+    // Example 2: Using enum class
+    // ---------------------------------------------------------------
+    Direction dir = Direction::East;
 
-    // 3. Direct initialization
-    int c(20);
-    cout << "Direct-initialized c = " << c << "\n";
+    std::cout << "\n=== enum class ===" << std::endl;
 
-    // 4. List initialization
-    int d{30};
-    cout << "List-initialized d = " << d << "\n";
+    // Print numeric value by casting to int
+    std::cout << "Direction (numeric): " << static_cast<int>(dir) << std::endl;
 
-    // 5. Aggregate initialization (struct + array)
-    struct Point { int x; int y; };
-    Point p = {3, 4};
-    cout << "Aggregate-initialized struct p = (" << p.x << ", " << p.y << ")\n";
+    // Print textual name using helper function
+    std::cout << "Direction (string): " << toString(dir) << std::endl;
 
-    int arr[3]= {1, 2, 3} ;
-    cout << "Aggregate-initialized array = {" << arr[0] << ", " << arr[1] << ", " << arr[2] << "}\n";
+    // Or print directly using overloaded operator<<
+    // std::cout << "Direction (using operator<<): " << dir << std::endl;
 
-    // 6. Reference initialization
-    int& ref = b;
-    cout << "Reference-initialized ref (refers to b): " << ref << "\n";
+    // Example of a switch using enum class
+    std::cout << "\nSwitch example: ";
+    switch (dir) {
+        case Direction::North:
+            std::cout << "Moving North";
+            break;
+        case Direction::East:
+            std::cout << "Moving East";
+            break;
+        case Direction::South:
+            std::cout << "Moving South";
+            break;
+        case Direction::West:
+            std::cout << "Moving West";
+            break;
+    }
+    std::cout << std::endl;
 
-    // 7. Dynamic initialization
-    int dyn = calcValue(); // Value returned by a function at runtime
-    cout << "Dynamic-initialized dyn = " << dyn << "\n";
-
-    // 8. Static local initialization
-    static int localStatic = 77;
-    cout << "Static local var localStatic = " << localStatic << "\n";
-
-    cout << "Global variables: globalA = " << globalA << ", globalB = " << globalB << "\n";
-
-    cout << "=== End of Demonstration ===\n";
     return 0;
 }
