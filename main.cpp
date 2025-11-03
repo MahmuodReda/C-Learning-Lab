@@ -1,71 +1,45 @@
-#include <bits/stdc++.h>
-#include <cstring>
+#include <iostream>
 
-// struct/class functions and variables
-// 1- can allocate in same scope of object
-// 2- from memory side: data members are allocated inside the object scope (stack or heap)
-// 3- functions (methods) are stored in the .text section (code segment)
+class PersonWithoutThis {
+private:
+    int age;  // Data member of the class
 
-class personData {
-    public:
-    int age;
-    char name[12];
-
-    // Constructor
-    // RAII: Resource Acquisition Is Initialization
-    // Automatically called when an object is created
-    personData() {
-        std::cout << "Constructor called" << std::endl;
-        age = 25;
-        strcpy(name, "Mahmood");
+public:
+    // Constructor without 'this' - demonstrates the name shadowing problem
+    PersonWithoutThis(int age) {
+        age = age;  // Name shadowing: This assigns the parameter to itself, not the class member!
+                    // As a result, the class member 'age' remains uninitialized (may have garbage value).
     }
 
-    // Destructor
-    // Automatically called when object goes out of scope or is deleted
-    ~personData() {
-        std::cout << "Destructor called" << std::endl;
-        age = 0;
-        strcpy(name, "");
+    void printAge() {
+        std::cout << "Age (without this): " << age << std::endl;  // Prints uninitialized or garbage value due to shadowing
     }
-
-    // If defined this way (inline, inside the class):
-// void showInfo() { 
-//     std::cout << "Name: " << name << ", Age: " << age << std::endl;
-// }
-// It is not stored in .text as a separate symbol unless called (and not fully inlined by the compiler).
- 
-    void showInfo(); 
-//    { 
-//        std::cout << "Name: " << name << ", Age: " << age << std::endl;
-//    }
-    // Example function
-  
 };
- void personData:: showInfo() {
-        std::cout << "Name: " << name << ", Age: " << age << std::endl;
+
+class PersonWithThis {
+private:
+    int age;  // Data member of the class
+
+public:
+    // Constructor with 'this' - solves the name shadowing problem
+    PersonWithThis(int age) {
+        this->age = age;  // 'this->age' refers to the class member, assigning the parameter value to it correctly.
+                          // This avoids shadowing and ensures proper initialization.
     }
-/*
-/ STACK FRAME:
-    p.age
-    p.name
-/ TEXT SECTION:
-    personData::showInfo()
-*/
 
-// In this definition style (non-inline, defined outside the class), 
-// the function is stored in the .text section even if not called, due to external linkage.
+    void printAge() {
+        std::cout << "Age (with this): " << this->age << std::endl;  // Prints the correct value; 'this' is optional here but shown for clarity
+    }
+};
 
-
-// Main function
 int main() {
-    personData Reda; // object created on stack -> constructor runs automatically
+    // Create object from the class without 'this' - shows the problem
+    PersonWithoutThis p1(30);
+    p1.printAge();  // Output: Age (without this): 0 (or some garbage value, depending on compiler)
 
-    std::cout << "Age: " << Reda.age << std::endl;
-    std::cout << "Name: " << Reda.name << std::endl;
+    // Create object from the class with 'this' - shows the solution
+    PersonWithThis p2(30);
+    p2.printAge();  // Output: Age (with this): 30 (correct value)
 
-    Reda.showInfo(); // calling member function
-
-    std::cout << "Program is ending..." << std::endl;
-
-    return EXIT_SUCCESS;
-} // when main ends, destructor runs automatically for 'Reda'
+    return 0;
+}
