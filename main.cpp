@@ -6,7 +6,8 @@
 // 2- from memory side: data members are allocated inside the object scope (stack or heap)
 // 3- functions (methods) are stored in the .text section (code segment)
 
-struct personData {
+class personData {
+    public:
     int age;
     char name[12];
 
@@ -27,12 +28,22 @@ struct personData {
         strcpy(name, "");
     }
 
+    // If defined this way (inline, inside the class):
+// void showInfo() { 
+//     std::cout << "Name: " << name << ", Age: " << age << std::endl;
+// }
+// It is not stored in .text as a separate symbol unless called (and not fully inlined by the compiler).
+ 
+    void showInfo(); 
+//    { 
+//        std::cout << "Name: " << name << ", Age: " << age << std::endl;
+//    }
     // Example function
-    void showInfo() {
+  
+};
+ void personData:: showInfo() {
         std::cout << "Name: " << name << ", Age: " << age << std::endl;
     }
-};
-
 /*
 / STACK FRAME:
     p.age
@@ -40,6 +51,10 @@ struct personData {
 / TEXT SECTION:
     personData::showInfo()
 */
+
+// In this definition style (non-inline, defined outside the class), 
+// the function is stored in the .text section even if not called, due to external linkage.
+
 
 // Main function
 int main() {
