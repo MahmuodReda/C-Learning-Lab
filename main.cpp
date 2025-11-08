@@ -5,21 +5,21 @@ using namespace std;
 
 class data1 {
 public:
-    void fun(const vector<char>& arr) {
+    void fun(const vector<int>& arr) {
         cout << "[data1] Checking if all elements are digits (0-9):" << endl;
 
         bool allDigits = true;
-        for (char num : arr) {
-            if (num < '0' || num > '9') {
+        for (int num : arr) {
+            if (num % 2 !=0 ) {
                 allDigits = false;
                 break;
             }
         }
 
         if (allDigits)
-            cout << " All elements are digits (0-9)." << endl;
+            cout << " All elements are even." << endl;
         else
-            cout << " Not all elements are digits." << endl;
+            cout << " Not all elements are even." << endl;
     }
 };
 
@@ -28,7 +28,7 @@ int main() {
     cout << "Enter number of elements: ";
     cin >> n;
 
-    vector<char> arr(n);
+    vector<int> arr(n);
 
     // Input array elements
     cout << "Enter array elements: ";
