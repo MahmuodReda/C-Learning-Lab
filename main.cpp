@@ -1,16 +1,18 @@
-#include <iostream>
-
-int &f() {
-    static int x = 0;     // static variable: lives for entire program
-    std::cout << "Current x = " << x << std::endl;
-    return x;              // return a reference to x (not address)
-}
+#include <iostream>     // include for input/output (not used here but standard)
+#include <vector>       // include the vector container from STL
 
 int main() {
-    f() = 10;   // f() returns reference to x → means x = 10
-    // ↳ "f()" behaves exactly like "x" because it's a reference
-    // ↳ So this line stores 10 into x
 
-    f() = 0;    // Again assigns 0 to the same x (through reference)
-    // ↳ x = 0 now
+    std::vector<int> arr;  // create an empty vector of integers named arr
+
+    // loop from 10 to 999 (inclusive)
+    for (int i = 10; i < 1001; i++)
+    {
+        arr.push_back(i);  // add each value of i to the end of the vector
+    }
+
+    // at the end, arr contains all integers from 10 to 999
+    // total number of elements = 990 (1000 - 10)
+
+    return 0; // indicate successful program termination
 }
