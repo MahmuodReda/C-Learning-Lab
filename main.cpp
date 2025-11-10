@@ -1,43 +1,39 @@
-#include <iostream>     // For input/output operations
-#include <vector>       // For using the dynamic array (vector)
-#include <numeric>      // For std::accumulate to sum elements
+#include <iostream>
+#include <vector>
 
-// Define a class that calculates the sum of elements in a vector
-class MyClass
-{
-public:
-    MyClass();  // Default constructor (not used here)
 
-    // Static function to calculate sum of vector elements
-    static void Calculate(std::vector<int> &arr) {
-        // Use std::accumulate to sum all elements in the vector
-        MyClass::sum = std::accumulate(arr.begin(), arr.end(), 0);
+// -----------------------------
+// Example functions
+// -----------------------------
+void fun3(int x) {
 
-        // Print the calculated sum
-        std::cout << "Sum = " << MyClass::sum << std::endl;
-    }
+    std::cout << "fun3: begin\n";
 
-    // Static member variable to hold the sum
-    static int sum;
+    std::cout << "fun3: end\n";
+  
+}
 
-private:
-    // Private section (currently unused, but reserved for future members)
-};
+void fun2(int x) {
 
-// Initialize static member variable
-int MyClass::sum = 0;
+    std::cout << "fun2: begin\n";
+    fun3(x + 1);
+    std::cout << "fun2: end\n";
+}
 
-int main() {
-    // Create a vector of size 10
-    std::vector<int> arr(10);
+void fun1(int x) {
 
-    // Fill the vector with values from 0 to 9
-    for (int i = 0; i < 10; i++) {
-        arr[i] = i;
-    }
+    std::cout << "fun1: begin\n";
+    fun2(x + 1);
+    std::cout << "fun1: end\n";
+}
 
-    // Call the static function to calculate and display the sum
-    MyClass::Calculate(arr);
+int main(){
 
-    return 0; // Indicate successful program termination
+    std::cout << "Start program\n";
+
+    fun1(1);
+
+    std::cout << "Program finished\n";
+    return 0;
+
 }
