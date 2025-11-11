@@ -1,91 +1,133 @@
+
 #include <iostream>
 #include <vector>
 #include <string>
 #include <mutex>
 #include <iomanip>
 
-
+// -----------------------------
+// BackTrace class (singleton)
+// -----------------------------
 class BackTrace {
 public:
-  static void Enter( const  std::string &name) {
-     std::lock_guard<std::mutex> lock(BackTrace::mutex_);
-     BackTrace::stack.push_back(name);
-
-     
-      std::cout << "Enter to [" << name << "]\n";
-  
+    // Get singleton instance
+    static BackTrace &getInstance() {
+        static BackTrace instance;
+        return instance;
     }
-    static void  Exit() {
-   std::lock_guard<std::mutex> lock(BackTrace::mutex_);
-     if (!BackTrace::stack.empty()) {
-        std::cout << "Exit From [" << BackTrace::stack.back() << "]\n"; 
-       BackTrace::stack.pop_back();
+
+    // push function name on the stack (entering a function)
+    void Enter(const std::string &name) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        stack_.push_back(name);
+        // Print minimal runtime message
+        std::cout << "Enter to [" << name << "]\n";
+    }
+
+    // pop the last function name (exiting a function)
+    void Exit() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (!stack_.empty()) {
+            std::string name = stack_.back();
+            stack_.pop_back();
+            std::cout << "Exit From [" << name << "]\n"; 
         } else {
             // defensive: nothing to pop
             std::cout << "Exit called but stack empty\n";
         }
-
     }
-    static void Print (){
-       std::lock_guard<std::mutex> lock(mutex_);
+ 
+    // print the backtrace from bottom (0) to top (N)
+    void Print() {
+        std::lock_guard<std::mutex> lock(mutex_);
         std::cout << "Backtrace as follows :\n";
-        for (int i =0 ; i < BackTrace::stack.size(); i++) {
-            std::cout << i << "_" << BackTrace::stack[i]<< std::endl;
-        
+        for (size_t i = 0; i < stack_.size(); ++i) {
+            std::cout << i << "- " << stack_[i] << "\n";
         }
-          std::cout << "Back Trace is Finished\n";
-
-
+        std::cout << "Back Trace is Finished\n";
     }
 
+    // clear stack (if needed)
+    void Clear() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        stack_.clear();
+    }
 
-     
-private: 
-static std::vector<std::string> stack ;
-static std::mutex mutex_;
+private:
+    BackTrace() = default;
+    ~BackTrace() = default;
+    BackTrace(const BackTrace&) = delete;
+    BackTrace& operator=(const BackTrace&) = delete;
+
+    std::vector<std::string> stack_;
+    std::mutex mutex_;
 };
-std::vector<std::string> BackTrace::stack;
-std::mutex BackTrace::mutex_;
+
+// -----------------------------
+// RAII helper: push name on ctor and pop on dtor
+// usage: ScopedTrace t(__FUNCTION__);
+// -----------------------------
+class ScopedTrace {
+public:
+    explicit ScopedTrace(const char* fn_name) : name_(fn_name) {
+        BackTrace::getInstance().Enter(name_);
+    }
+    ~ScopedTrace() {
+        BackTrace::getInstance().Exit();
+    }
+
+    // non-copyable
+    ScopedTrace(const ScopedTrace&) = delete;
+    ScopedTrace& operator=(const ScopedTrace&) = delete;
+
+private:
+    const char* name_;
+};
+
+// -----------------------------
+// Macros for convenience
+// -----------------------------
+#define EnterFn BackTrace::getInstance().Enter(__FUNCTION__)
+#define ExitFn  BackTrace::getInstance().Exit()
+#define PRINT_BT BackTrace::getInstance().Print()
+#define SCOPED_TRACE ScopedTrace __scoped_trace__(__FUNCTION__)
+
 // -----------------------------
 // Example functions
 // -----------------------------
 void fun3(int x) {
-BackTrace::Enter(__func__);
-    std::cout << "fun3: begin\n";
-BackTrace::Print() ; 
-    std::cout << "fun3: end\n";
-    BackTrace::Exit() ;
-  
+    // use RAII so we don't forget to call Exit
+    SCOPED_TRACE;
+    // do some work...
+    std::cout << "fun3: doing work with x=" << x << "\n";
+
+    // print current backtrace (optional)
+    PRINT_BT;
+    // when function returns, ScopedTrace destructor will call Exit()
 }
 
 void fun2(int x) {
-BackTrace::Enter(__func__);
+    SCOPED_TRACE;
     std::cout << "fun2: begin\n";
     fun3(x + 1);
     std::cout << "fun2: end\n";
-     BackTrace::Exit() ;
 }
 
 void fun1(int x) {
-
-    BackTrace::Enter(__func__);
-    
+    SCOPED_TRACE;
     std::cout << "fun1: begin\n";
     fun2(x + 1);
     std::cout << "fun1: end\n";
-     BackTrace::Exit() ;
 }
 
-int main(){
-BackTrace::Enter(__func__);
+int main() {
+    SCOPED_TRACE; // marks "main"
     std::cout << "Start program\n";
 
     fun1(1);
- BackTrace::Exit() ;
-    std::cout << "Program finished\n";
-        
-    return 0;
 
+    std::cout << "Program finished\n";
+    return 0;
 }
 
 // Enter to [main]
@@ -95,18 +137,17 @@ BackTrace::Enter(__func__);
 // Enter to [fun2]
 // fun2: begin
 // Enter to [fun3]
-// fun3: begin
+// fun3: doing work with x=3
 // Backtrace as follows :
-// 0_main
-// 1_fun1
-// 2_fun2
-// 3_fun3
+// 0- main
+// 1- fun1
+// 2- fun2
+// 3- fun3
 // Back Trace is Finished
-// fun3: end
 // Exit From [fun3]
 // fun2: end
 // Exit From [fun2]
 // fun1: end
 // Exit From [fun1]
-// Exit From [main]
 // Program finished
+// Exit From [main]
