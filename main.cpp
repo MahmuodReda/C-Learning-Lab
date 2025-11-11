@@ -26,6 +26,18 @@ public:
         }
 
     }
+    static void Print (){
+       std::lock_guard<std::mutex> lock(mutex_);
+        std::cout << "Backtrace as follows :\n";
+        for (int i =0 ; i < BackTrace::stack.size(); i++) {
+            std::cout << i << "_" << BackTrace::stack[i]<< std::endl;
+        
+        }
+          std::cout << "Back Trace is Finished\n";
+
+
+    }
+
 
      
 private: 
@@ -40,7 +52,7 @@ std::mutex BackTrace::mutex_;
 void fun3(int x) {
 BackTrace::Enter(__func__);
     std::cout << "fun3: begin\n";
-
+BackTrace::Print() ; 
     std::cout << "fun3: end\n";
     BackTrace::Exit() ;
   
@@ -84,6 +96,12 @@ BackTrace::Enter(__func__);
 // fun2: begin
 // Enter to [fun3]
 // fun3: begin
+// Backtrace as follows :
+// 0_main
+// 1_fun1
+// 2_fun2
+// 3_fun3
+// Back Trace is Finished
 // fun3: end
 // Exit From [fun3]
 // fun2: end
