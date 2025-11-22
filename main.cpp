@@ -1,185 +1,74 @@
 #include <iostream>
-#include <cstring>
 
+int getValue() {
+    // Returns a prvalue (temporary integer with no name)
+    return 5;
+}
 
-// CLASS A — Demonstrates COPY CONSTRUCTOR
+// Overload to detect lvalue
+void inspect(int& x) {
+    std::cout << "[inspect] Lvalue reference called, value = " << x << "\n";
+}
 
-class A {
-private:
-    char* buffer;   // stored on HEAP
-    int size;
-
-public:
-    // Constructor
-    A(const char* text) {
-        size = strlen(text);
-        buffer = new char[size + 1];   // allocate on HEAP
-        memcpy(buffer, text, size + 1);
-        std::cout << "A: Normal Constructor\n";
-    }
-  void modfayBuffer(const char* newText) {
-        size_t newSize = strlen(newText);
-        if (newSize <= size) {
-            memcpy(buffer, newText, newSize + 1); // +1 to include null terminator
-        } else {
-            std::cout << "New text is too large to fit in the existing buffer.\n";
-        }
-    }
-
-    // COPY CONSTRUCTOR (Deep Copy)
-    A(const A& other) {
-        std::cout << "A: Copy Constructor\n";
-
-        size = other.size;
-        buffer = new char[size + 1];           // allocate new memory
-        memcpy(buffer, other.buffer, size + 1); // deep copy data
-
-        /*
-            MEMORY VIEW (Copy Constructor)
-            -------------------------------
-            STACK:
-                other.buffer ---> [0x100 HEAP BLOCK] "ABC"
-                this.buffer  ---> [0x200 HEAP BLOCK] "ABC"
-        */
-    }
-
-    void print() const {
-        std::cout << buffer << "\n";
-    }
-
-    ~A() {
-        std::cout << "A: Destructor (delete buffer)\n";
-        delete[] buffer;  // free HEAP memory
-    }
-};
-
-
-// CLASS B — Demonstrates COPY ASSIGNMENT OPERATOR     
-
-class B {
-private:
-    char* buffer;  
-    int size;
-
-public:
-    B(const char* text) {
-        size = strlen(text);
-        buffer = new char[size + 1];
-        memcpy(buffer, text, size + 1);
-        std::cout << "B: Normal Constructor\n";
-    }
-
-    void modfayBuffer(const char* newText) {
-        size_t newSize = strlen(newText);
-        if (newSize <= size) {
-            memcpy(buffer, newText, newSize + 1); // +1 to include null terminator
-        } else {
-            std::cout << "New text is too large to fit in the existing buffer.\n";
-        }
-    }
-
-    // COPY ASSIGNMENT OPERATOR
-    B& operator=(const B& other) {
-        std::cout << "B: Copy Assignment Operator\n";
-
-        // Self-assignment check
-        if (this == &other)
-            return *this;
-
-        /*
-            Before writing new data, we must clean the old HEAP block:
-
-            MEMORY BEFORE ASSIGNMENT
-            ------------------------
-            STACK:
-                this.buffer ---> [0x300 HEAP BLOCK] "XYZ"
-                other.buffer ---> [0x400 HEAP BLOCK] "HELLO"
-        */
-
-        delete[] buffer; // delete old HEAP memory first (VERY IMPORTANT)
-
-        // Allocate new block
-        size = other.size;
-        buffer = new char[size + 1];
-        memcpy(buffer, other.buffer, size + 1);
-
-        /*
-            MEMORY AFTER ASSIGNMENT
-            -----------------------
-            STACK:
-                this.buffer ---> [0x500 NEW HEAP BLOCK] "HELLO"
-                other.buffer ---> [0x400 HEAP BLOCK] "HELLO"
-        */
-
-        return *this;
-    }
-
-    void print() const {
-        std::cout << buffer << "\n";
-    }
-
-    ~B() {
-        std::cout << "B: Destructor (delete buffer)\n";
-        delete[] buffer;
-    }
-};
-
+// Overload to detect rvalue
+void inspect(int&& x) {
+    std::cout << "[inspect] Rvalue reference called, value = " << x << "\n";
+}
 
 int main() {
 
-    std::cout << "\n=== COPY CONSTRUCTOR DEMO (Class A) ===\n";
-    A a1("ABC");
-    A a2 = a1;      // calls COPY CONSTRUCTOR
-    a2.print();
-    a1.print();
+    std::cout << "===== LVALUE EXAMPLE =====\n";
+    int a = 10;   // 'a' is an lvalue (has name + address)
+    inspect(a);   // Calls inspect(int&)
 
-    a1.modfayBuffer("DEF");
-    std::cout << "After modifying a1's buffer:\n";
-    a1.print();
-    a2.print();     // should still be "ABC" if deep copy worked
-    
+    std::cout << "\n===== RVALUE EXAMPLE =====\n";
+    inspect(20);  // 20 is an rvalue → calls inspect(int&&)
 
+    std::cout << "\n===== BINDING RVALUE TO RVALUE REFERENCE =====\n";
+    int&& tempRef = getValue();
+    /*
+        getValue() returns a prvalue (temporary).
+        int&& can bind to that temporary.
+        After binding, tempRef becomes an LVALUE (because it has a name now).
+    */
+    std::cout << "tempRef = " << tempRef << "\n"; // prints 5
 
-    std::cout << "\n=== COPY ASSIGNMENT DEMO (Class B) ===\n";
-    B b1("XYZ");
-    B b2("HELLO");
+    std::cout << "\n===== WHAT THE COMPILER SEES =====\n";
+    // These two are identical in semantics:
+    int&& x1 = getValue();     // programmer version
+    int&& x2 = int(5);         // what compiler interprets (temporary int)
 
-    b1 = b2;       // calls COPY ASSIGNMENT
-    b1.print();
+    std::cout << "x1 = " << x1 << ", x2 = " << x2 << "\n";
 
-    b1.modfayBuffer("WORLD");
-    std::cout << "After modifying b1's buffer:\n";  
-    b1.print();
-    b2.print();     // should still be "HELLO" if deep copy worked
-
-    std::cout << "\n=== SELF ASSIGNMENT TEST ===\n";
-    b1 = b1;       // safe due to (this == &other) check
+    std::cout << "\n===== XVALUE DEMO (std::move) =====\n";
+    int b = 50;
+    inspect(std::move(b));  // move(b) turns b into an xvalue (expiring value)
 
     return 0;
 }
 
+/*
+==========================================
+               MEMORY DIAGRAM
+==========================================
 
-// === COPY CONSTRUCTOR DEMO (Class A) ===
-// A: Normal Constructor
-// A: Copy Constructor
-// ABC
-// ABC
-// After modifying a1's buffer:
-// DEF
-// ABC
+Stack:
+---------------------------------------------------------
+| a (lvalue) -> value: 10                                 |
+| b (lvalue) -> value: 50                                 |
+| tempRef (lvalue name but refers to Rvalue) -> 5         |
+| x1 (lvalue name but refers to Rvalue) -> 5              |
+| x2 (lvalue name but refers to Rvalue) -> 5              |
+---------------------------------------------------------
 
-// === COPY ASSIGNMENT DEMO (Class B) ===
-// B: Normal Constructor
-// B: Normal Constructor
-// B: Copy Assignment Operator
-// HELLO
-// After modifying b1's buffer:
-// WORLD
-// HELLO
+Temporaries Area (compiler-managed):
+---------------------------------------------------------
+| temporary #1: result of getValue() → 5                  |
+| temporary #2: literal 20 (rvalue)                       |
+| temporary #3: result of std::move(b) → xvalue of b      |
+---------------------------------------------------------
 
-// === SELF ASSIGNMENT TEST ===
-// B: Copy Assignment Operator
-// B: Destructor (delete buffer)
-// B: Destructor (delete buffer)
-// A: Destructor (delete buffer)
-// A: Destructor (delete buffer)
+Notes:
+1. getValue() returns a prvalue (rvalue with no name).
+2. int&& binds to rvalues only.
+*/
