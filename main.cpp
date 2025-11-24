@@ -1,202 +1,97 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 //
-// ========================= CLASS INT =========================
-// A simple integer wrapper class to demonstrate operator overloading
+// ========================= CLASS MyLOG =========================
+//  A simple logger class supporting multiple log levels (INFO, WARN, ERROR).
+//  All log messages are stored inside a shared static buffer (vector).
 //
-class INT
+class MyLOG
 {
 public:
-    int val;
-
-    // Default constructor (initialize value to 0)
-    INT() : val(0) {}
-
-    // Parameterized constructor
-    INT(int a) : val(a) {}
-
-    // ---------------------- Arithmetic Operators ----------------------
-
-    // Return a NEW INT object containing (this->val + obj.val)
-    INT operator+(const INT &obj)
+    // Log levels
+    enum Level
     {
-        return INT(this->val + obj.val);
-    }
+        INFO,
+        WARN,
+        ERROR
+    };
 
-    // Return a NEW INT object containing (this->val - obj.val)
-    INT operator-(const INT &obj)
-    {
-        return INT(this->val - obj.val);
-    }
+    // Shared buffer for all log entries
+    static std::vector<std::string> vec;
 
-    // Modify *this then return *this
-    INT operator+=(const INT &obj)
-    {
-        this->val += obj.val;
-        return *this;
-    }
-
-    INT operator-=(const INT &obj)
-    {
-        this->val -= obj.val;
-        return *this;
-    }
-
-    // ---------------------- Comparison Operators ----------------------
-
-    bool operator==(const INT &obj) { return this->val == obj.val; }
-    bool operator!=(const INT &obj) { return this->val != obj.val; }
-    bool operator<(const INT &obj) { return this->val < obj.val; }
-    bool operator>(const INT &obj) { return this->val > obj.val; }
-
-    // ---------------------- Assignment Operator ----------------------
-
-    INT operator=(const INT &obj)
-    {
-        this->val = obj.val;
-        return *this;
-    }
-};
-
-//
-// Overload << for INT to print the value
-//
-std::ostream &operator<<(std::ostream &os, const INT &p)
-{
-    os << "(" << p.val << ")";
-    return os;
-}
-
-//
-// ========================= CLASS MyString =========================
-// A wrapper around std::string to demonstrate operator overloading
-//
-class MyString
-{
-public:
-    std::string val;
+    // The log level for this object
+    Level val;
 
     // Default constructor
-    MyString() : val("") {}
+    MyLOG() {}
 
-    // Accept C-string literal
-    MyString(const char *a) : val(a) {}
+    // Constructor that sets the log level
+    MyLOG(Level l) : val(l) {}
 
-    // Accept std::string
-    MyString(const std::string &a) : val(a) {}
-
-    // ---------------------- Arithmetic Operators ----------------------
-
-    // return NEW object (concatenation)
-    MyString operator+(const MyString &obj)
+    // Operator >> used to add messages to the log buffer
+    void operator>>(const std::string &msg)
     {
-        return MyString(val + obj.val);
+        if (val == INFO)
+            vec.push_back("[INFO] " + msg);
+        else if (val == WARN)
+            vec.push_back("[WARN] " + msg);
+        else if (val == ERROR)
+            vec.push_back("[ERROR] " + msg);
     }
 
-    // append to *this then return *this
-    MyString operator+=(const MyString &obj)
+    // Prints all stored log messages
+    static void Dump()
     {
-        this->val += obj.val;
-        return *this;
+        std::cout << "======= LOG DUMP =======" << std::endl;
+
+        for (const auto &m : vec)
+            std::cout << m << std::endl;
+
+        std::cout << "========================" << std::endl;
     }
 
-    // ---------------------- Comparison Operators ----------------------
-
-    bool operator==(const MyString &obj) { return this->val == obj.val; }
-    bool operator!=(const MyString &obj) { return this->val != obj.val; }
-    bool operator<(const MyString &obj) { return this->val < obj.val; }
-    bool operator>(const MyString &obj) { return this->val > obj.val; }
-
-    // ---------------------- Assignment Operator ----------------------
-
-    MyString operator=(const MyString &obj)
+    // Clears all log messages
+    static void Clear()
     {
-        this->val = obj.val;
-        return *this;
+        vec.clear();
     }
 };
 
-//
-// Overload << for MyString
-//
-std::ostream &operator<<(std::ostream &os, const MyString &p)
-{
-    os << p.val;
-    return os;
-}
+// Static member definition
+std::vector<std::string> MyLOG::vec;
 
 //
 // ========================= TEST SECTION =========================
 //
 int main()
 {
-    std::cout << "===== Testing INT class =====\n";
+    // Add some log entries using temporary objects
+    MyLOG(MyLOG::INFO) >> "First entry.";
+    MyLOG(MyLOG::WARN) >> "Second entry.";
+    MyLOG(MyLOG::ERROR) >> "Third entry.";
 
-    INT a(10);
-    INT b(3);
+    // Print the log contents
+    MyLOG::Dump();
 
-    INT sum = a + b; // new object
-    INT diff = a - b;
+    // Clear all stored messages
+    MyLOG::Clear();
 
-    std::cout << "a = " << a << "\n";
-    std::cout << "b = " << b << "\n";
-    std::cout << "a + b = " << sum << "\n";
-    std::cout << "a - b = " << diff << "\n";
+    // Add a new message after clearing
+    MyLOG(MyLOG::INFO) >> "Fourth entry after clear.";
 
-    a += b;
-    std::cout << "a += b -> a = " << a << "\n";
-
-    // comparisons
-    std::cout << "a == b ? " << (a == b) << "\n";
-    std::cout << "a >  b ? " << (a > b) << "\n";
-
-    // assignment operator
-    INT x;
-    x = a;
-    std::cout << "x = a -> x = " << x << "\n";
-
-    std::cout << "\n===== Testing MyString class =====\n";
-
-    MyString s1("Hello");
-    MyString s2(" World");
-
-    MyString s3 = s1 + s2; // new object
-
-    std::cout << "s1 = " << s1 << "\n";
-    std::cout << "s2 = " << s2 << "\n";
-    std::cout << "s1 + s2 = " << s3 << "\n";
-
-    s1 += s2;
-    std::cout << "s1 += s2 -> s1 = " << s1 << "\n";
-
-    // comparisons
-    std::cout << "s1 == s3 ? " << (s1 == s3) << "\n";
-    std::cout << "s1 <  s3 ? " << (s1 < s3) << "\n";
-
-    // assignment
-    MyString s4;
-    s4 = s3;
-    std::cout << "s4 = s3 -> s4 = " << s4 << "\n";
+    // Print the log again
+    MyLOG::Dump();
 
     return 0;
 }
 
-// ===== Testing INT class =====
-// a = (10)
-// b = (3)
-// a + b = (13)
-// a - b = (7)
-// a += b -> a = (13)
-// a == b ? 0
-// a >  b ? 1
-// x = a -> x = (13)
-
-// ===== Testing MyString class =====
-// s1 = Hello
-// s2 =  World
-// s1 + s2 = Hello World
-// s1 += s2 -> s1 = Hello World
-// s1 == s3 ? 1
-// s1 <  s3 ? 0
-// s4 = s3 -> s4 = Hello World
+// ======= LOG DUMP =======
+// [INFO] First entry.
+// [WARN] Second entry.
+// [ERROR] Third entry.
+// ========================
+// ======= LOG DUMP =======
+// [INFO] Fourth entry after clear.
+// ========================
