@@ -3,52 +3,48 @@
 class A
 {
 public:
-    A() { std::cout << "A: Constructor\n"; }
-    ~A() { std::cout << "A: Destructor\n"; }
+    A() { std::cout << "A: Constructor\n"; } // Constructor
+    ~A() { std::cout << "A: Destructor\n"; } // Destructor
 
-    void Show()
-    {
-        std::cout << "A: Parent function\n";
-    }
+    void ShowA() { std::cout << "A: Function\n"; }
 };
 
-class B : public A
+class B
 {
 public:
-    B() { std::cout << "B: Constructor\n"; }
-    ~B() { std::cout << "B: Destructor\n"; }
+    B() { std::cout << "B: Constructor\n"; } // Constructor
+    ~B() { std::cout << "B: Destructor\n"; } // Destructor
 
-    void MsgB()
-    {
-        std::cout << "B: Child B function\n";
-    }
+    void ShowB() { std::cout << "B: Function\n"; }
 };
 
-class C : public A
+class C : public A, public B
 {
 public:
-    C() { std::cout << "C: Constructor\n"; }
-    ~C() { std::cout << "C: Destructor\n"; }
+    C() { std::cout << "C: Constructor\n"; } // Constructor
+    ~C() { std::cout << "C: Destructor\n"; } // Destructor
 
-    void MsgC()
-    {
-        std::cout << "C: Child C function\n";
-    }
+    void ShowC() { std::cout << "C: Function\n"; }
 };
 
 int main()
 {
-    B objB;
-    objB.Show();
-    objB.MsgB();
-
-    std::cout << "----\n";
-
-    C objC;
-    objC.Show();
-    objC.MsgC();
+    C obj;
+    obj.ShowA(); // Accessing base class A function
+    obj.ShowB(); // Accessing base class B function
+    obj.ShowC(); // Accessing derived class C function
 }
 
-/*   A
-   /   \
-  B     C */
+//   A     B
+//    \   /
+//      C
+// Multiple Inheritance Example
+// A: Constructor
+// B: Constructor
+// C: Constructor
+// A: Function
+// B: Function
+// C: Function
+// C: Destructor
+// B: Destructor
+// A: Destructor
