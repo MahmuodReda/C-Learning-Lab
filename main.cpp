@@ -3,42 +3,53 @@
 class A
 {
 public:
-    A() { std::cout << "A: Constructor\n"; } // Constructor
-    ~A() { std::cout << "A: Destructor\n"; } // Destructor
+    A() { std::cout << "A: Constructor\n"; }
+    ~A() { std::cout << "A: Destructor\n"; }
 
-    void Show()
+    void ShowA()
     {
-        std::cout << "A: Parent function\n";
+        std::cout << "A: Level 1 function\n";
     }
 };
 
 class B : public A
 {
 public:
-    B() { std::cout << "B: Constructor\n"; } // Constructor
-    ~B() { std::cout << "B: Destructor\n"; } // Destructor
+    B() { std::cout << "B: Constructor\n"; }
+    ~B() { std::cout << "B: Destructor\n"; }
 
-    void Print()
+    void ShowB()
     {
-        std::cout << "B: Child function\n";
+        std::cout << "B: Level 2 function\n";
+    }
+};
+
+class C : public B
+{
+public:
+    C() { std::cout << "C: Constructor\n"; }
+    ~C() { std::cout << "C: Destructor\n"; }
+
+    void ShowC()
+    {
+        std::cout << "C: Level 3 function\n";
     }
 };
 
 int main()
 {
-    B obj;
-    obj.Show();  // Call parent class function
-    obj.Print(); // Call child class function
+    C obj;
+    obj.ShowA();
+    obj.ShowB();
+    obj.ShowC();
 }
-
-// Class A
-//  ↓
-// Class B
-// Inheritance: B inherits from A
-
+// A → B → C
 // A: Constructor
 // B: Constructor
-// A: Parent function
-// B: Child function
+// C: Constructor
+// A: Level 1 function
+// B: Level 2 function
+// C: Level 3 function
+// C: Destructor
 // B: Destructor
 // A: Destructor
