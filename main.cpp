@@ -6,9 +6,9 @@ public:
     A() { std::cout << "A: Constructor\n"; }
     ~A() { std::cout << "A: Destructor\n"; }
 
-    void ShowA()
+    void Show()
     {
-        std::cout << "A: Level 1 function\n";
+        std::cout << "A: Parent function\n";
     }
 };
 
@@ -18,38 +18,37 @@ public:
     B() { std::cout << "B: Constructor\n"; }
     ~B() { std::cout << "B: Destructor\n"; }
 
-    void ShowB()
+    void MsgB()
     {
-        std::cout << "B: Level 2 function\n";
+        std::cout << "B: Child B function\n";
     }
 };
 
-class C : public B
+class C : public A
 {
 public:
     C() { std::cout << "C: Constructor\n"; }
     ~C() { std::cout << "C: Destructor\n"; }
 
-    void ShowC()
+    void MsgC()
     {
-        std::cout << "C: Level 3 function\n";
+        std::cout << "C: Child C function\n";
     }
 };
 
 int main()
 {
-    C obj;
-    obj.ShowA();
-    obj.ShowB();
-    obj.ShowC();
+    B objB;
+    objB.Show();
+    objB.MsgB();
+
+    std::cout << "----\n";
+
+    C objC;
+    objC.Show();
+    objC.MsgC();
 }
-// A → B → C
-// A: Constructor
-// B: Constructor
-// C: Constructor
-// A: Level 1 function
-// B: Level 2 function
-// C: Level 3 function
-// C: Destructor
-// B: Destructor
-// A: Destructor
+
+/*   A
+   /   \
+  B     C */
