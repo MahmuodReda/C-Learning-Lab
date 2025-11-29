@@ -1,198 +1,73 @@
 #include <iostream>
 
-// ==================== Base Class ====================
+// ================= Interface (Pure Abstract Class) =================
 class Base
 {
 public:
-    int pub = 1; // Public member
-protected:
-    int prot = 2; // Protected member
-private:
-    int priv = 3; // Private member
-
-public:
-    Base() { std::cout << "Base Constructor\n"; }
-    ~Base() { std::cout << "Base Destructor\n"; }
+    virtual void print() = 0;  // pure virtual
+    virtual void print2() = 0; // pure virtual
+    virtual void print3() = 0; // pure virtual
 };
 
-// ==================== Public Inheritance ====================
-class DerivedPublic : public Base
+// ================= Abstract Class (NOT pure) ======================
+class baseabstract
 {
 public:
-    DerivedPublic()
+    // Virtual but NOT pure -> class is NOT abstract
+    virtual void print()
     {
-        std::cout << "DerivedPublic Constructor\n";
-
-        // Accessible inside the class
-        std::cout << "Public: " << pub << "\n";
-        std::cout << "Protected: " << prot << "\n";
-        // priv -> NOT accessible
-    }
-
-    ~DerivedPublic()
-    {
-        std::cout << "DerivedPublic Destructor\n";
+        std::cout << "baseabstract\n";
     }
 };
 
-// ==================== Protected Inheritance ====================
-class DerivedProtected : protected Base
+// ================= Derived from abstract class ====================
+class data : public baseabstract
 {
 public:
-    DerivedProtected()
+    void print() override
     {
-        std::cout << "DerivedProtected Constructor\n";
-
-        // Base public becomes PROTECTED in this class
-        std::cout << "Public becomes Protected: " << pub << "\n";
-        std::cout << "Protected: " << prot << "\n";
-        // priv -> NOT accessible
-    }
-
-    ~DerivedProtected()
-    {
-        std::cout << "DerivedProtected Destructor\n";
+        std::cout << "data\n";
     }
 };
 
-// ==================== Private Inheritance ====================
-class DerivedPrivate : private Base
+// ================= Derived from Interface =========================
+class derived : public Base
 {
 public:
-    DerivedPrivate()
+    void print() override
     {
-        std::cout << "DerivedPrivate Constructor\n";
-
-        // Base public becomes PRIVATE in this class
-        std::cout << "Public becomes Private: " << pub << "\n";
-        // Base protected becomes PRIVATE in this class
-        std::cout << "Protected becomes Private: " << prot << "\n";
-        // priv -> NOT accessible
+        std::cout << "print()\n";
     }
 
-    ~DerivedPrivate()
+    void print2() override
     {
-        std::cout << "DerivedPrivate Destructor\n";
+        std::cout << "print2()\n";
     }
-};
 
-// ==================================================================
-// ======================= FRIEND EXAMPLE ============================
-// ==================================================================
-
-// ------------ Version WITH friend ------------
-class FriendE;
-
-class SecretBox
-{
-private:
-    int secretValue = 999; // Private member
-
-public:
-    // Declare FriendE as a friend
-    friend class FriendE;
-};
-
-class FriendE
-{
-public:
-    void ShowSecret(SecretBox &box)
+    void print3() override
     {
-        // Can access private because it is a friend
-        std::cout << "Friend can access private: " << box.secretValue << "\n";
+        std::cout << "print3()\n";
     }
 };
 
-// ------------ Version WITHOUT friend ------------
-class SecretBox_NoFriend
-{
-private:
-    int secretValue = 999; // Private member
-
-public:
-    // No friend declared here
-};
-
-class NoFriendE
-{
-public:
-    void TryAccess(SecretBox_NoFriend &box)
-    {
-        // ERROR if uncommented: cannot access private
-        // std::cout << box.secretValue;
-
-        std::cout << "NoFriend cannot access private members.\n";
-    }
-};
-
-// ==================== Main ====================
+// =============================== MAIN =============================
 int main()
 {
-    std::cout << "=== Public Inheritance ===\n";
-    DerivedPublic dp;
+    data d2;
+    d2.print(); // Calls overridden version -> "data"
 
-    // Public inheritance -> Base public stays public
-    std::cout << "Main access to dp.pub = " << dp.pub << "\n"; // OK
+    // Base is an INTERFACE -> cannot create:
+    // Base b; // ERROR
 
-    // std::cout << dp.prot;   // ERROR: protected
-    // std::cout << dp.priv;   // ERROR: private
-
-    std::cout << "\n=== Protected Inheritance ===\n";
-    DerivedProtected dprot;
-
-    // Public from Base becomes protected -> NOT accessible here
-    // std::cout << dprot.pub;   // ERROR
-    std::cout << "Main cannot access dprot.pub (protected).\n";
-
-    std::cout << "\n=== Private Inheritance ===\n";
-    DerivedPrivate dpriv;
-
-    // Public from Base becomes private -> NOT accessible here
-    // std::cout << dpriv.pub;    // ERROR
-    std::cout << "Main cannot access dpriv.pub (private).\n";
-
-    std::cout << "\n=== Friend  ===\n";
-    SecretBox box;
-    FriendE fe;
-    fe.ShowSecret(box); // Can access private
-
-    std::cout << "\n=== No-Friend  ===\n";
-    SecretBox_NoFriend box2;
-    NoFriendE nfe;
-    nfe.TryAccess(box2); // Cannot access private
+    derived d;
+    d.print();
+    d.print2();
+    d.print3();
 
     return 0;
 }
 
-// === Public Inheritance ===
-// Base Constructor
-// DerivedPublic Constructor
-// Public: 1
-// Protected: 2
-// Main access to dp.pub = 1
-
-// === Protected Inheritance ===
-// Base Constructor
-// DerivedProtected Constructor
-// Public becomes Protected: 1
-// Protected: 2
-// Main cannot access dprot.pub (protected).
-
-// === Private Inheritance ===
-// Base Constructor
-// DerivedPrivate Constructor
-// Public becomes Private: 1
-// Protected becomes Private: 2
-// Main cannot access dpriv.pub (private).
-
-// === Friend  ===
-// Friend can access private: 999
-
-// === No-Friend  ===
-// NoFriend cannot access private members.
-// DerivedPrivate Destructor
-// Base Destructor
-// DerivedProtected Destructor
-// Base Destructor
-// DerivedPublic Destructor
-// Base Destructor
+// data
+// print()
+// print2()
+// print3()
