@@ -1,73 +1,60 @@
 #include <iostream>
 
-// ================= Interface (Pure Abstract Class) =================
-class Base
+class Animal
 {
 public:
-    virtual void print() = 0;  // pure virtual
-    virtual void print2() = 0; // pure virtual
-    virtual void print3() = 0; // pure virtual
-};
-
-// ================= Abstract Class (NOT pure) ======================
-class baseabstract
-{
-public:
-    // Virtual but NOT pure -> class is NOT abstract
-    virtual void print()
+    // Virtual function enables runtime polymorphism
+    virtual void makeSound()
     {
-        std::cout << "baseabstract\n";
+        std::cout << "The animal makes a sound." << std::endl;
     }
 };
 
-// ================= Derived from abstract class ====================
-class data : public baseabstract
+class Dog : public Animal
 {
 public:
-    void print() override
+    // Overriding the base class version of makeSound()
+    void makeSound() override
     {
-        std::cout << "data\n";
+        std::cout << "The dog barks." << std::endl;
+    }
+
+    // Function specific to Dog only
+    void dog_specific()
+    {
+        std::cout << "Dog specific function." << std::endl;
     }
 };
 
-// ================= Derived from Interface =========================
-class derived : public Base
+// Function that receives a pointer to base class
+void fun(Animal *animal)
 {
-public:
-    void print() override
-    {
-        std::cout << "print()\n";
-    }
+    // Calls the correct version depending on actual object (polymorphism)
+    animal->makeSound();
 
-    void print2() override
-    {
-        std::cout << "print2()\n";
-    }
+    // animal->dog_specific();  // ERROR: base class does not have this function
 
-    void print3() override
-    {
-        std::cout << "print3()\n";
-    }
-};
+    // dynamic_cast safely checks if 'animal' actually points to a Dog object
+    Dog *dog = dynamic_cast<Dog *>(animal);
 
-// =============================== MAIN =============================
+    // If the cast succeeds, dog is not null
+    if (dog != nullptr)
+    {
+        dog->dog_specific();
+    }
+}
+
 int main()
 {
-    data d2;
-    d2.print(); // Calls overridden version -> "data"
+    // Creating a Dog object but storing it in an Animal pointer (polymorphism)
+    Animal *animal1 = new Dog();
 
-    // Base is an INTERFACE -> cannot create:
-    // Base b; // ERROR
+    // Passing to function that uses dynamic_cast
+    fun(animal1);
 
-    derived d;
-    d.print();
-    d.print2();
-    d.print3();
-
+    delete animal1; // Free allocated memory
     return 0;
 }
 
-// data
-// print()
-// print2()
-// print3()
+// The dog barks.
+// Dog specific function.
