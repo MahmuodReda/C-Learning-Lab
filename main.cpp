@@ -1,60 +1,101 @@
 #include <iostream>
+#include <string>
+#include <vector>
 
-class Animal
+/**
+ * @class mydata
+ * @brief Demonstrates normal constructor and initializer_list constructor.
+ */
+class mydata
 {
 public:
-    // Virtual function enables runtime polymorphism
-    virtual void makeSound()
+    int x;
+    int y;
+
+    /**
+     * @brief Normal constructor initializing x and y.
+     * @param x Initial value for x.
+     * @param y Initial value for y.
+     */
+    mydata(int x, int y) : x(x), y(y)
     {
-        std::cout << "The animal makes a sound." << std::endl;
+        std::cout << "mydata constructor" << std::endl;
+    }
+
+    /**
+     * @brief Initializer list constructor.
+     * @param v List of integers to print during construction.
+     */
+    mydata(std::initializer_list<int> v)
+    {
+        std::cout << "initializer list constructor" << std::endl;
+        for (auto i : v)
+        {
+            std::cout << i << std::endl;
+        }
     }
 };
 
-class Dog : public Animal
+/**
+ * @brief Demonstrates all major std::string constructors.
+ */
+void construct_test()
 {
-public:
-    // Overriding the base class version of makeSound()
-    void makeSound() override
-    {
-        std::cout << "The dog barks." << std::endl;
-    }
+    std::string s = "Hello, World!";
 
-    // Function specific to Dog only
-    void dog_specific()
-    {
-        std::cout << "Dog specific function." << std::endl;
-    }
-};
+    /** Copy constructor */
+    std::string str1(s);
 
-// Function that receives a pointer to base class
-void fun(Animal *animal)
-{
-    // Calls the correct version depending on actual object (polymorphism)
-    animal->makeSound();
+    /** Copy constructor (assignment-style) */
+    std::string str2 = s;
 
-    // animal->dog_specific();  // ERROR: base class does not have this function
+    /** Move constructor */
+    std::string str3(std::move(s));
 
-    // dynamic_cast safely checks if 'animal' actually points to a Dog object
-    Dog *dog = dynamic_cast<Dog *>(animal);
+    /** Range constructor */
+    std::string str4(str1.begin(), str1.end());
 
-    // If the cast succeeds, dog is not null
-    if (dog != nullptr)
-    {
-        dog->dog_specific();
-    }
+    /** Substring constructor (pos=7, len=5 → "World") */
+    std::string str5(str1, 7, 5);
+
+    /** Constructing from vector<char> */
+    std::vector<char> v = {'a', 'b', 'c', 'd', 'e'};
+    std::string str6(v.begin(), v.end());
+
+    /** Initializer list constructor */
+    std::string str7({'a', 'b', 'c', 'd', 'e'});
+
+    std::cout << "str1 = " << str1 << std::endl;
+    std::cout << "str3 = " << str3 << std::endl;
+    std::cout << "str5 = " << str5 << std::endl;
+    std::cout << "str6 = " << str6 << std::endl;
 }
 
+/**
+ * @brief Entry point of the program.
+ * @return int Exit code.
+ */
 int main()
 {
-    // Creating a Dog object but storing it in an Animal pointer (polymorphism)
-    Animal *animal1 = new Dog();
+    construct_test();
 
-    // Passing to function that uses dynamic_cast
-    fun(animal1);
+    /** Normal constructor */
+    mydata m{1, 2};
 
-    delete animal1; // Free allocated memory
+    /** Initializer list constructor */
+    mydata m2{3, 4, 5};
+
     return 0;
 }
 
-// The dog barks.
-// Dog specific function.
+// str1 = Hello, World!
+// str3 = Hello, World!
+// str5 = World
+// str6 = abcde
+// initializer list constructor
+// 1
+// 2
+// initializer list constructor
+// 3
+// 4
+// 5
