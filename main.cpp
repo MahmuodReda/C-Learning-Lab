@@ -1,12 +1,13 @@
 #include <iostream>
-#include <array>
-#include <algorithm>
+#include <vector>
+#include <string>
 
-template <typename T, std::size_t N>
-void print_array(const std::array<T, N> &arr, const std::string &name)
+template <typename T>
+void print_vector(const std::vector<T> &v, const std::string &name)
 {
-  std::cout << name << " (size: " << arr.size() << "): ";
-  for (const auto &e : arr)
+  std::cout << name << " (size: " << v.size()
+            << ", capacity: " << v.capacity() << "): ";
+  for (const auto &e : v)
     std::cout << e << " ";
   std::cout << "\n";
 }
@@ -14,78 +15,84 @@ void print_array(const std::array<T, N> &arr, const std::string &name)
 int main()
 {
   // 1. Constructors
-  std::array<int, 5> a1;                   // default (uninitialized values)
-  std::array<int, 5> a2 = {1, 2, 3, 4, 5}; // initializer list
-  std::array<int, 5> a3(a2);               // copy constructor
-  std::array<int, 5> a4 = a2;              // copy assignment
-  std::array<int, 5> a5 = {0};             // fill first element, rest become 0
+  std::vector<int> v1;                       // default constructor
+  std::vector<int> v2(3, 10);                // fill constructor: 3 elements, each 10
+  std::vector<int> v3 = {1, 2, 3, 4};        // initializer list
+  std::vector<int> v4(v3);                   // copy constructor
+  std::vector<int> v5(v3.begin(), v3.end()); // range constructor
+  std::vector<int> v6 = std::move(v4);       // move constructor
 
-  print_array(a2, "a2");
-  print_array(a3, "a3");
-  print_array(a5, "a5");
+  print_vector(v3, "v3");
+  print_vector(v2, "v2");
+  print_vector(v4, "v4 (moved)"); // should be empty
+  print_vector(v6, "v6 (moved from v4)");
 
-  // 2. Element access
-  std::cout << "a2[0]: " << a2[0] << "\n";         // operator[]
-  std::cout << "a2.at(1): " << a2.at(1) << "\n";   // bounds-checked
-  std::cout << "front: " << a2.front() << "\n";    // first element
-  std::cout << "back: " << a2.back() << "\n";      // last element
-  std::cout << "data(): " << *(a2.data()) << "\n"; // pointer to raw array
+  // 2. Modifiers
+  v3.push_back(5);                      // add element at the end
+  v3.emplace_back(6);                   // add element in place at the end
+  v3.insert(v3.begin(), 0);             // insert element at beginning
+  v3.emplace(v3.begin() + 2, 99);       // insert element in place
+  v3.erase(v3.begin() + 1);             // remove element at index 1
+  v3.erase(v3.begin(), v3.begin() + 2); // remove first two elements
+  v3.assign({7, 8, 9, 10});             // assign new values
+  v3.assign(3, 42);                     // assign 3 elements of value 42
 
-  // 3. Iterators
-  std::cout << "Forward iteration: ";
-  for (auto it = a2.begin(); it != a2.end(); ++it)
+  print_vector(v3, "v3 after modifications");
+
+  // 3. Element access
+  std::cout << "First element (front): " << v3.front() << "\n";
+  std::cout << "Last element (back): " << v3.back() << "\n";
+  std::cout << "Element at index 1 (at): " << v3.at(1) << "\n";
+
+  // 4. Capacity
+  std::cout << "Empty? " << (v3.empty() ? "Yes" : "No") << "\n";
+  std::cout << "Size: " << v3.size() << "\n";
+  std::cout << "Max size: " << v3.max_size() << "\n";
+  std::cout << "Capacity: " << v3.capacity() << "\n";
+  v3.reserve(10); // reserve space for 10 elements
+  std::cout << "Capacity after reserve(10): " << v3.capacity() << "\n";
+  v3.shrink_to_fit(); // reduce capacity to fit size
+  std::cout << "Capacity after shrink_to_fit(): " << v3.capacity() << "\n";
+
+  // 5. Iterators
+  std::cout << "Vector using iterators: ";
+  for (auto it = v3.begin(); it != v3.end(); ++it)
     std::cout << *it << " ";
   std::cout << "\n";
 
-  std::cout << "Reverse iteration: ";
-  for (auto rit = a2.rbegin(); rit != a2.rend(); ++rit)
+  std::cout << "Vector using reverse iterators: ";
+  for (auto rit = v3.rbegin(); rit != v3.rend(); ++rit)
     std::cout << *rit << " ";
   std::cout << "\n";
 
-  // 4. Capacity (all fixed)
-  std::cout << "size: " << a2.size() << "\n";
-  std::cout << "max_size: " << a2.max_size() << "\n";
-  std::cout << "empty: " << (a2.empty() ? "yes" : "no") << "\n";
+  // 6. Swap
+  std::vector<int> swap_vec = {100, 200, 300};
+  v3.swap(swap_vec);
+  print_vector(v3, "v3 after swap");
+  print_vector(swap_vec, "swap_vec after swap");
 
-  // 5. Operations
-  a1.fill(7); // fill all elements with 7
-  print_array(a1, "a1 after fill()");
-
-  a1.swap(a2); // swap contents of two arrays
-  print_array(a1, "a1 after swap");
-  print_array(a2, "a2 after swap");
-
-  // 6. Algorithms (work perfectly with array)
-  std::sort(a2.begin(), a2.end());
-  print_array(a2, "a2 after sort");
-
-  std::reverse(a2.begin(), a2.end());
-  print_array(a2, "a2 after reverse");
-
-  int sum = 0;
-  for (auto &x : a2)
-    sum += x;
-  std::cout << "Sum = " << sum << "\n";
+  // 7. Clear
+  v3.clear();
+  print_vector(v3, "v3 after clear");
 
   return 0;
 }
-
-// a2 (size: 5): 1 2 3 4 5
-// a3 (size: 5): 1 2 3 4 5
-// a5 (size: 5): 0 0 0 0 0
-// a2[0]: 1
-// a2.at(1): 2
-// front: 1
-// back: 5
-// data(): 1
-// Forward iteration: 1 2 3 4 5
-// Reverse iteration: 5 4 3 2 1
-// size: 5
-// max_size: 5
-// empty: no
-// a1 after fill() (size: 5): 7 7 7 7 7
-// a1 after swap (size: 5): 1 2 3 4 5
-// a2 after swap (size: 5): 7 7 7 7 7
-// a2 after sort (size: 5): 7 7 7 7 7
-// a2 after reverse (size: 5): 7 7 7 7 7
-// Sum = 35
+// v3 (size: 4, capacity: 4): 1 2 3 4
+// v2 (size: 3, capacity: 3): 10 10 10
+// v4 (moved) (size: 0, capacity: 0):
+// v6 (moved from v4) (size: 4, capacity: 4): 1 2 3 4
+// v3 after modifications (size: 3, capacity: 8): 42 42 42
+// First element (front): 42
+// Last element (back): 42
+// Element at index 1 (at): 42
+// Empty? No
+// Size: 3
+// Max size: 2305843009213693951
+// Capacity: 8
+// Capacity after reserve(10): 10
+// Capacity after shrink_to_fit(): 3
+// Vector using iterators: 42 42 42
+// Vector using reverse iterators: 42 42 42
+// v3 after swap (size: 3, capacity: 3): 100 200 300
+// swap_vec after swap (size: 3, capacity: 3): 42 42 42
+// v3 after clear (size: 0, capacity: 3):
