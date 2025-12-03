@@ -1,92 +1,43 @@
-#include <algorithm>
-#include <cctype>
-#include <string>
+#include <array>
 #include <iostream>
-
-/*********************************************************************** */
-/// Simple example function (unused in main)
-/// Checks if 'body' starts with 'prefix'
-bool starts_with2(std::string body, std::string prefix)
-{
-  if (prefix.size() > body.size())
-    return false;
-  return std::equal(prefix.begin(), prefix.end(), body.begin());
-}
-
-/// EnhancedString: extends std::string by adding utility functions
-class EnhancedString : public std::string
-{
-public:
-  /// Inherit all std::string constructors
-  using std::string::string;
-
-  /// Checks if the current string starts with 'prefix'
-  bool starts_with(std::string prefix)
-  {
-    if (prefix.size() > this->size())
-      return false;
-    return std::equal(prefix.begin(), prefix.end(), this->begin());
-  }
-
-  /// Checks if the current string ends with 'suffix'
-  bool ends_with(std::string suffix)
-  {
-    if (suffix.size() > this->size())
-      return false;
-    return std::equal(suffix.rbegin(), suffix.rend(), this->rbegin());
-  }
-
-  /// Converts all characters to uppercase (in-place)
-  void to_upper()
-  {
-    std::transform(this->begin(), this->end(), this->begin(),
-                   [](unsigned char c)
-                   { return std::toupper(c); });
-  }
-
-  /// Converts all characters to lowercase (in-place)
-  void to_lower()
-  {
-    std::transform(this->begin(), this->end(), this->begin(),
-                   [](unsigned char c)
-                   { return std::tolower(c); });
-  }
-
-  /// Reverses the string (in-place)
-  void reverse()
-  {
-    std::reverse(this->begin(), this->end());
-  }
-};
 
 int main()
 {
-  std::cout << std::boolalpha; // print bools as true/false
+  // Create a fixed-size array of 5 integers
+  std::array<int, 5> arr = {1, 0, 3}; // indices 1,3,4 default to 0
 
-  /// Create an EnhancedString initialized with a literal
-  EnhancedString s = "Hello, World!";
+  // Print array size
+  std::cout << "Array size: " << arr.size() << std::endl; // size() returns 5
 
-  /// Test starts_with()
-  std::cout << s.starts_with("Hello") << std::endl; // true
-  std::cout << s.starts_with("Hell@") << std::endl; // false
+  // Check if array is empty
+  std::cout << "Is array empty? " << (arr.empty() ? "Yes" : "No") << std::endl;
 
-  /// Convert to uppercase
-  s.to_upper();
-  std::cout << s << std::endl;
+  // Access elements using at() with bounds checking
+  try
+  {
+    std::cout << "Element at index 2: " << arr.at(2) << std::endl;
+    // arr.at(10); // would throw out_of_range if uncommented
+  }
+  catch (const std::out_of_range &e)
+  {
+    std::cout << "Error: " << e.what() << std::endl;
+  }
 
-  /// Convert to lowercase
-  s.to_lower();
-  std::cout << s << std::endl;
+  // Modify an element using []
+  arr[1] = 12; // index 1
 
-  /// Reverse the string
-  s.reverse();
-  std::cout << s << std::endl;
+  // Print all elements using range-based for loop
+  std::cout << "Array elements: ";
+  for (const auto &i : arr)
+  {
+    std::cout << i << " "; // prints: 1 12 3 0 0
+  }
+  std::cout << std::endl;
 
   return 0;
 }
 
-// true
-// false
-// HELLO, WORLD!
-// hello, world!
-// !dlrow ,olleh
+// Array size: 5
+// Is array empty? No
+// Element at index 2: 3
+// Array elements: 1 12 3 0 0
