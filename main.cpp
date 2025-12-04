@@ -1,9 +1,9 @@
 #include <iostream>
-#include <set>
+#include <unordered_set>
 #include <string>
 
-template <typename T, typename Compare = std::less<T>>
-void print_set(const std::set<T, Compare> &s, const std::string &name)
+template <typename T>
+void print_unordered_set(const std::unordered_set<T> &s, const std::string &name)
 {
   std::cout << name << " (size: " << s.size() << "): ";
   for (const auto &e : s)
@@ -14,111 +14,81 @@ void print_set(const std::set<T, Compare> &s, const std::string &name)
 int main()
 {
   // 1. Constructors
-  std::set<int> s1;                       // default constructor
-  std::set<int> s2 = {4, 1, 3, 2, 2};     // initializer list constructor (duplicates ignored)
-  std::set<int> s3(s2);                   // copy constructor
-  std::set<int> s4(s2.begin(), s2.end()); // range constructor
-  std::set<int> s5(std::move(s4));        // move constructor (s4 becomes empty)
+  std::unordered_set<int> us1;                         // default constructor
+  std::unordered_set<int> us2 = {4, 1, 3, 2, 2};       // initializer list constructor (duplicates ignored)
+  std::unordered_set<int> us3(us2);                    // copy constructor
+  std::unordered_set<int> us4(us2.begin(), us2.end()); // range constructor
+  std::unordered_set<int> us5(std::move(us4));         // move constructor (us4 becomes empty)
 
-  print_set(s2, "s2");
-  print_set(s3, "s3 (copy of s2)");
-  print_set(s4, "s4 (moved, should be empty)");
-  print_set(s5, "s5 (moved from s4)");
+  print_unordered_set(us2, "us2");
+  print_unordered_set(us3, "us3 (copy of us2)");
+  print_unordered_set(us4, "us4 (moved, should be empty)");
+  print_unordered_set(us5, "us5 (moved from us4)");
 
   // 2. Modifiers
-  s2.insert(5);         // insert single element
-  s2.insert({6, 7, 8}); // insert initializer list
-  s2.erase(1);          // erase element by value
-  s2.erase(s2.begin()); // erase element by iterator
-  print_set(s2, "s2 after insert and erase");
+  us2.insert(5);         // insert single element
+  us2.insert({6, 7, 8}); // insert initializer list
+  us2.erase(1);          // erase element by value
+  print_unordered_set(us2, "us2 after insert and erase");
 
-  s3.clear(); // clear set
-  print_set(s3, "s3 after clear");
+  us3.clear(); // clear set
+  print_unordered_set(us3, "us3 after clear");
 
-  // 3. Element access / lookup
-  std::cout << "s2 contains 5? " << (s2.count(5) ? "Yes" : "No") << "\n";
-  auto it = s2.find(6);
-  if (it != s2.end())
-    std::cout << "Found element 6 in s2: " << *it << "\n";
+  // 3. Lookup
+  std::cout << "us2 contains 5? " << (us2.count(5) ? "Yes" : "No") << "\n";
+  auto it = us2.find(6);
+  if (it != us2.end())
+    std::cout << "Found element 6 in us2: " << *it << "\n";
   else
-    std::cout << "Element 6 not found in s2\n";
+    std::cout << "Element 6 not found in us2\n";
 
-  std::cout << "Lower bound of 4 in s2: " << *s2.lower_bound(4) << "\n";
-  std::cout << "Upper bound of 4 in s2: " << *s2.upper_bound(4) << "\n";
-
-  // 4. Iterators
-  std::cout << "s2 using iterators: ";
-  for (auto it = s2.begin(); it != s2.end(); ++it)
+  // 4. Iterators (order is unspecified)
+  std::cout << "us2 using iterators (unordered, no order guaranteed): ";
+  for (auto it = us2.begin(); it != us2.end(); ++it)
     std::cout << *it << " ";
   std::cout << "\n";
 
-  std::cout << "s2 using reverse iterators: ";
-  for (auto rit = s2.rbegin(); rit != s2.rend(); ++rit)
-    std::cout << *rit << " ";
-  std::cout << "\n";
-
   // 5. Swap
-  std::set<int> swap_set = {100, 200, 300};
-  s2.swap(swap_set);
-  print_set(s2, "s2 after swap");
-  print_set(swap_set, "swap_set after swap");
+  std::unordered_set<int> swap_set = {100, 200, 300};
+  us2.swap(swap_set);
+  print_unordered_set(us2, "us2 after swap");
+  print_unordered_set(swap_set, "swap_set after swap");
 
   // 6. Size / empty
-  std::cout << "s2 empty? " << (s2.empty() ? "Yes" : "No") << "\n";
-  std::cout << "s2 size: " << s2.size() << "\n";
-
-  // 7. Custom comparator
-  std::set<int, std::greater<int>> s_desc = {1, 2, 3, 4, 5};
-  print_set(s_desc, "s_desc (descending order)");
+  std::cout << "us2 empty? " << (us2.empty() ? "Yes" : "No") << "\n";
+  std::cout << "us2 size: " << us2.size() << "\n";
 
   return 0;
 }
 
 /*
 
-Explanation:
+Notes about unordered_set:
 
-Constructors:
-- Default: empty
-- Initializer list: fills with unique sorted elements
-- Copy: duplicates another set
-- Range: builds from iterator range
-- Move: moves content, source becomes empty
-
-Modifiers:
-- insert(value), insert({list})
-- erase(value) or erase(iterator)
-- clear(), swap(other)
-
-Element Access / Lookup:
-- find(value): returns iterator or end
-- count(value): 0 or 1 since set has unique elements
-- lower_bound(value): first element >= value
-- upper_bound(value): first element > value
-
-Iterators:
-- begin() to end(): ascending order
-- rbegin() to rend(): descending iteration
-
-Custom comparator:
-- set<int, greater<int>> sorts elements in descending order
+- Constructors:
+  - default, initializer list, copy, range, move
+- Modifiers:
+  - insert(value), insert({list})
+  - erase(value), clear(), swap(other)
+- Lookup:
+  - find(value), count(value)
+- Iteration:
+  - begin() to end() iterates in unspecified order
+- No ordering guarantees unlike std::set
+- Uniqueness of elements is enforced
 
 */
 
-// s2 (size: 4): 1 2 3 4
-// s3 (copy of s2) (size: 4): 1 2 3 4
-// s4 (moved, should be empty) (size: 0):
-// s5 (moved from s4) (size: 4): 1 2 3 4
-// s2 after insert and erase (size: 6): 3 4 5 6 7 8
-// s3 after clear (size: 0):
-// s2 contains 5? Yes
-// Found element 6 in s2: 6
-// Lower bound of 4 in s2: 4
-// Upper bound of 4 in s2: 5
-// s2 using iterators: 3 4 5 6 7 8
-// s2 using reverse iterators: 8 7 6 5 4 3
-// s2 after swap (size: 3): 100 200 300
-// swap_set after swap (size: 6): 3 4 5 6 7 8
-// s2 empty? No
-// s2 size: 3
-// s_desc (descending order) (size: 5): 5 4 3 2 1
+// us2 (size: 4): 2 3 1 4
+// us3 (copy of us2) (size: 4): 2 3 1 4
+// us4 (moved, should be empty) (size: 0):
+// us5 (moved from us4) (size: 4): 4 1 3 2
+// us2 after insert and erase (size: 7): 8 7 6 5 2 3 4
+// us3 after clear (size: 0):
+// us2 contains 5? Yes
+// Found element 6 in us2: 6
+// us2 using iterators (unordered, no order guaranteed): 8 7 6 5 2 3 4
+// us2 after swap (size: 3): 300 200 100
+// swap_set after swap (size: 7): 8 7 6 5 2 3 4
+// us2 empty? No
+// us2 size: 3
