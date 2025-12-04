@@ -1,212 +1,124 @@
 #include <iostream>
-#include <vector>
-#include <deque>
-#include <list>
-#include <chrono>
+#include <set>
+#include <string>
 
-using namespace std;
-using namespace std::chrono;
-
-// Helper to measure time of any function
-template <typename Func>
-long long measure(Func f)
+template <typename T, typename Compare = std::less<T>>
+void print_set(const std::set<T, Compare> &s, const std::string &name)
 {
-  auto start = high_resolution_clock::now();
-  f();
-  auto end = high_resolution_clock::now();
-  return duration_cast<nanoseconds>(end - start).count(); // nanoseconds
+  std::cout << name << " (size: " << s.size() << "): ";
+  for (const auto &e : s)
+    std::cout << e << " ";
+  std::cout << "\n";
 }
 
 int main()
 {
-  const int N = 200000; // test size
+  // 1. Constructors
+  std::set<int> s1;                       // default constructor
+  std::set<int> s2 = {4, 1, 3, 2, 2};     // initializer list constructor (duplicates ignored)
+  std::set<int> s3(s2);                   // copy constructor
+  std::set<int> s4(s2.begin(), s2.end()); // range constructor
+  std::set<int> s5(std::move(s4));        // move constructor (s4 becomes empty)
 
-  vector<int> vec;
-  deque<int> deq;
-  list<int> lst;
+  print_set(s2, "s2");
+  print_set(s3, "s3 (copy of s2)");
+  print_set(s4, "s4 (moved, should be empty)");
+  print_set(s5, "s5 (moved from s4)");
 
-  // Fill containers
-  for (int i = 0; i < N; i++)
-  {
-    vec.push_back(i);
-    deq.push_back(i);
-    lst.push_back(i);
-  }
+  // 2. Modifiers
+  s2.insert(5);         // insert single element
+  s2.insert({6, 7, 8}); // insert initializer list
+  s2.erase(1);          // erase element by value
+  s2.erase(s2.begin()); // erase element by iterator
+  print_set(s2, "s2 after insert and erase");
 
-  cout << "=== INSERT FRONT ===\n";
-  cout << "vector : "
-       << measure([&]()
-                  { vec.insert(vec.begin(), -1); })
-       << " ns\n"; // result: 82700 ns  ← very slow
+  s3.clear(); // clear set
+  print_set(s3, "s3 after clear");
 
-  cout << "deque  : "
-       << measure([&]()
-                  { deq.push_front(-1); })
-       << " ns\n"; // result: 2600 ns   ← fast
+  // 3. Element access / lookup
+  std::cout << "s2 contains 5? " << (s2.count(5) ? "Yes" : "No") << "\n";
+  auto it = s2.find(6);
+  if (it != s2.end())
+    std::cout << "Found element 6 in s2: " << *it << "\n";
+  else
+    std::cout << "Element 6 not found in s2\n";
 
-  cout << "list   : "
-       << measure([&]()
-                  { lst.push_front(-1); })
-       << " ns\n\n"; // result: 1900 ns   ← fastest
+  std::cout << "Lower bound of 4 in s2: " << *s2.lower_bound(4) << "\n";
+  std::cout << "Upper bound of 4 in s2: " << *s2.upper_bound(4) << "\n";
 
-  cout << "=== INSERT MIDDLE ===\n";
-  cout << "vector : "
-       << measure([&]()
-                  { vec.insert(vec.begin() + vec.size() / 2, -2); })
-       << " ns\n"; // result: 26000 ns
+  // 4. Iterators
+  std::cout << "s2 using iterators: ";
+  for (auto it = s2.begin(); it != s2.end(); ++it)
+    std::cout << *it << " ";
+  std::cout << "\n";
 
-  cout << "deque  : "
-       << measure([&]()
-                  { deq.insert(deq.begin() + deq.size() / 2, -2); })
-       << " ns\n"; // result: 142700 ns
+  std::cout << "s2 using reverse iterators: ";
+  for (auto rit = s2.rbegin(); rit != s2.rend(); ++rit)
+    std::cout << *rit << " ";
+  std::cout << "\n";
 
-  cout << "list   : "
-       << measure([&]()
-                  { 
-             auto it = lst.begin();
-             advance(it, lst.size()/2);
-             lst.insert(it, -2); })
-       << " ns\n\n"; // result: 1143700 ns
+  // 5. Swap
+  std::set<int> swap_set = {100, 200, 300};
+  s2.swap(swap_set);
+  print_set(s2, "s2 after swap");
+  print_set(swap_set, "swap_set after swap");
 
-  cout << "=== INSERT BACK ===\n";
-  cout << "vector : "
-       << measure([&]()
-                  { vec.push_back(-3); })
-       << " ns\n"; // result: 2800 ns
+  // 6. Size / empty
+  std::cout << "s2 empty? " << (s2.empty() ? "Yes" : "No") << "\n";
+  std::cout << "s2 size: " << s2.size() << "\n";
 
-  cout << "deque  : "
-       << measure([&]()
-                  { deq.push_back(-3); })
-       << " ns\n"; // result: 900 ns
-
-  cout << "list   : "
-       << measure([&]()
-                  { lst.push_back(-3); })
-       << " ns\n\n"; // result: 3500 ns
-
-  cout << "=== ERASE MIDDLE ===\n";
-  cout << "vector : "
-       << measure([&]()
-                  { vec.erase(vec.begin() + vec.size() / 2); })
-       << " ns\n"; // result: 60700 ns
-
-  cout << "deque  : "
-       << measure([&]()
-                  { deq.erase(deq.begin() + deq.size() / 2); })
-       << " ns\n"; // result: 198400 ns
-
-  cout << "list   : "
-       << measure([&]()
-                  { 
-             auto it = lst.begin();
-             advance(it, lst.size()/2);
-             lst.erase(it); })
-       << " ns\n\n"; // result: 1153600 ns
-
-  cout << "=== RANDOM ACCESS (ELEMENT #10000) ===\n";
-  cout << "vector : "
-       << measure([&]()
-                  { volatile int x = vec[10000]; })
-       << " ns\n"; // result: 400 ns
-
-  cout << "deque  : "
-       << measure([&]()
-                  { volatile int x = deq[10000]; })
-       << " ns\n"; // result: 1100 ns
-
-  cout << "list   : list has no random access\n";
-
-  /* ---------------------------------------------------
-     EXPLANATION & ASCII ILLUSTRATIONS
-  ----------------------------------------------------
-
-  INSERT FRONT:
-  ------------------------
-  VECTOR (slow: 82700 ns)
-  Contiguous memory:
-     [A][B][C][D][E]
-  Insert FRONT → all elements shift:
-     [X][A][B][C][D][E]  ← shift O(n)
-
-  DEQUE (fast: 2600 ns)
-  Segmented blocks:
-     [Block1][Block2][Block3]
-  push_front() adds small block → O(1)
-
-  LIST (fastest: 1900 ns)
-  Doubly linked:
-     A<->B<->C<->D
-  push_front() just changes head pointer → O(1)
-
-  INSERT MIDDLE:
-  ------------------------
-  VECTOR (26000 ns)
-     [0 1 2 | X | 3 4 5] → shift right O(n/2)
-
-  DEQUE (142700 ns)
-     [B1][B2][B3][B4] → internal block shifting → O(n/2)
-
-  LIST (1143700 ns)
-     traverse to middle → 100k steps → O(n), insert O(1)
-
-  INSERT BACK:
-  ------------------------
-  VECTOR (2800 ns)
-     amortized O(1) if capacity sufficient
-
-  DEQUE (900 ns)
-     back insert O(1) always
-
-  LIST (3500 ns)
-     pointer update O(1), slight allocation overhead
-
-  ERASE MIDDLE:
-  ------------------------
-  VECTOR (60700 ns)
-     shift left elements → O(n/2)
-
-  DEQUE (198400 ns)
-     block shifts → heavier than vector
-
-  LIST (1153600 ns)
-     traverse to middle → O(n), erase O(1)
-
-  RANDOM ACCESS:
-  ------------------------
-  VECTOR (fastest: 400 ns)
-     direct indexing → O(1)
-
-  DEQUE (1100 ns)
-     block lookup + index → still O(1)
-
-  LIST (no random access)
-     must traverse node-by-node → O(n)
-  */
+  // 7. Custom comparator
+  std::set<int, std::greater<int>> s_desc = {1, 2, 3, 4, 5};
+  print_set(s_desc, "s_desc (descending order)");
 
   return 0;
 }
 
-// === INSERT FRONT ===
-// vector : 82700 ns
-// deque  : 2600 ns
-// list   : 1900 ns
+/*
 
-// === INSERT MIDDLE ===
-// vector : 26000 ns
-// deque  : 142700 ns
-// list   : 1143700 ns
+Explanation:
 
-// === INSERT BACK ===
-// vector : 2800 ns
-// deque  : 900 ns
-// list   : 3500 ns
+Constructors:
+- Default: empty
+- Initializer list: fills with unique sorted elements
+- Copy: duplicates another set
+- Range: builds from iterator range
+- Move: moves content, source becomes empty
 
-// === ERASE MIDDLE ===
-// vector : 60700 ns
-// deque  : 198400 ns
-// list   : 1153600 ns
+Modifiers:
+- insert(value), insert({list})
+- erase(value) or erase(iterator)
+- clear(), swap(other)
 
-// === RANDOM ACCESS (ELEMENT #10000) ===
-// vector : 400 ns
-// deque  : 1100 ns
-// list   : list has no random access
+Element Access / Lookup:
+- find(value): returns iterator or end
+- count(value): 0 or 1 since set has unique elements
+- lower_bound(value): first element >= value
+- upper_bound(value): first element > value
+
+Iterators:
+- begin() to end(): ascending order
+- rbegin() to rend(): descending iteration
+
+Custom comparator:
+- set<int, greater<int>> sorts elements in descending order
+
+*/
+
+// s2 (size: 4): 1 2 3 4
+// s3 (copy of s2) (size: 4): 1 2 3 4
+// s4 (moved, should be empty) (size: 0):
+// s5 (moved from s4) (size: 4): 1 2 3 4
+// s2 after insert and erase (size: 6): 3 4 5 6 7 8
+// s3 after clear (size: 0):
+// s2 contains 5? Yes
+// Found element 6 in s2: 6
+// Lower bound of 4 in s2: 4
+// Upper bound of 4 in s2: 5
+// s2 using iterators: 3 4 5 6 7 8
+// s2 using reverse iterators: 8 7 6 5 4 3
+// s2 after swap (size: 3): 100 200 300
+// swap_set after swap (size: 6): 3 4 5 6 7 8
+// s2 empty? No
+// s2 size: 3
+// s_desc (descending order) (size: 5): 5 4 3 2 1
