@@ -1,94 +1,120 @@
 #include <iostream>
-#include <unordered_set>
-#include <string>
-
-template <typename T>
-void print_unordered_set(const std::unordered_set<T> &s, const std::string &name)
-{
-  std::cout << name << " (size: " << s.size() << "): ";
-  for (const auto &e : s)
-    std::cout << e << " ";
-  std::cout << "\n";
-}
+#include <stack>
+#include <queue>
+#include <vector>
 
 int main()
 {
-  // 1. Constructors
-  std::unordered_set<int> us1;                         // default constructor
-  std::unordered_set<int> us2 = {4, 1, 3, 2, 2};       // initializer list constructor (duplicates ignored)
-  std::unordered_set<int> us3(us2);                    // copy constructor
-  std::unordered_set<int> us4(us2.begin(), us2.end()); // range constructor
-  std::unordered_set<int> us5(std::move(us4));         // move constructor (us4 becomes empty)
 
-  print_unordered_set(us2, "us2");
-  print_unordered_set(us3, "us3 (copy of us2)");
-  print_unordered_set(us4, "us4 (moved, should be empty)");
-  print_unordered_set(us5, "us5 (moved from us4)");
+  /* ----------------------------------------------------
+     1) STACK  (LIFO: Last In First Out)
+     -----------------------------------------------------
+     - Uses: recursion, undo history, parsers.
+     - Default underlying container = deque.
+  ----------------------------------------------------- */
+  std::stack<int> st;
 
-  // 2. Modifiers
-  us2.insert(5);         // insert single element
-  us2.insert({6, 7, 8}); // insert initializer list
-  us2.erase(1);          // erase element by value
-  print_unordered_set(us2, "us2 after insert and erase");
+  st.push(10); // add on top
+  st.push(20);
+  st.push(30);
 
-  us3.clear(); // clear set
-  print_unordered_set(us3, "us3 after clear");
+  std::cout << "--- STACK ---\n";
+  std::cout << "Top: " << st.top() << "\n"; // 30
 
-  // 3. Lookup
-  std::cout << "us2 contains 5? " << (us2.count(5) ? "Yes" : "No") << "\n";
-  auto it = us2.find(6);
-  if (it != us2.end())
-    std::cout << "Found element 6 in us2: " << *it << "\n";
-  else
-    std::cout << "Element 6 not found in us2\n";
+  st.pop(); // remove last inserted (30)
 
-  // 4. Iterators (order is unspecified)
-  std::cout << "us2 using iterators (unordered, no order guaranteed): ";
-  for (auto it = us2.begin(); it != us2.end(); ++it)
-    std::cout << *it << " ";
-  std::cout << "\n";
+  std::cout << "Top after pop: " << st.top() << "\n"; // 20
+  std::cout << "Size: " << st.size() << "\n\n";
 
-  // 5. Swap
-  std::unordered_set<int> swap_set = {100, 200, 300};
-  us2.swap(swap_set);
-  print_unordered_set(us2, "us2 after swap");
-  print_unordered_set(swap_set, "swap_set after swap");
+  /* STACK SHAPE (before pop)
+        top
+         ↓
+      | 30 |
+      | 20 |
+      | 10 |
 
-  // 6. Size / empty
-  std::cout << "us2 empty? " << (us2.empty() ? "Yes" : "No") << "\n";
-  std::cout << "us2 size: " << us2.size() << "\n";
+     after pop:
+      | 20 |
+      | 10 |
+  */
+
+  /* ----------------------------------------------------
+     2) QUEUE  (FIFO: First In First Out)
+     -----------------------------------------------------
+     - Uses: message queues, tasks, event handlers.
+     - Default underlying container = deque.
+  ----------------------------------------------------- */
+  std::queue<int> q;
+
+  q.push(1); // insert at back
+  q.push(2);
+  q.push(3);
+
+  std::cout << "--- QUEUE ---\n";
+  std::cout << "Front: " << q.front() << "\n"; // 1
+  std::cout << "Back : " << q.back() << "\n";  // 3
+
+  q.pop(); // remove 1 (first inserted)
+
+  std::cout << "Front after pop: " << q.front() << "\n";
+  std::cout << "Size: " << q.size() << "\n\n";
+
+  /* QUEUE SHAPE (before pop)
+     front → [1][2][3] ← back
+
+     after pop:
+     front → [2][3] ← back
+  */
+
+  /* ----------------------------------------------------
+     3) PRIORITY QUEUE  (Max-Heap by default)
+     -----------------------------------------------------
+     - Largest element always at top.
+     - Default underlying container = vector.
+     - Uses: scheduling, graph algorithms (Dijkstra), etc.
+  ----------------------------------------------------- */
+  std::priority_queue<int> pq;
+
+  pq.push(40);
+  pq.push(10);
+  pq.push(70);
+  pq.push(50);
+
+  std::cout << "--- PRIORITY QUEUE ---\n";
+  std::cout << "Top (max): " << pq.top() << "\n"; // 70
+
+  pq.pop(); // remove max element (70)
+
+  std::cout << "Top after pop: " << pq.top() << "\n"; // 50
+  std::cout << "Size: " << pq.size() << "\n\n";
+
+  /* PRIORITY QUEUE SHAPE (as heap)
+         (70)
+        /    \
+      50     40
+     /
+   10
+
+     after pop:
+         (50)
+        /    \
+      10     40
+  */
 
   return 0;
 }
+// --- STACK ---
+// Top: 30
+// Top after pop: 20
+// Size: 2
 
-/*
+// --- QUEUE ---
+// Front: 1
+// Back : 3
+// Front after pop: 2
+// Size: 2
 
-Notes about unordered_set:
-
-- Constructors:
-  - default, initializer list, copy, range, move
-- Modifiers:
-  - insert(value), insert({list})
-  - erase(value), clear(), swap(other)
-- Lookup:
-  - find(value), count(value)
-- Iteration:
-  - begin() to end() iterates in unspecified order
-- No ordering guarantees unlike std::set
-- Uniqueness of elements is enforced
-
-*/
-
-// us2 (size: 4): 2 3 1 4
-// us3 (copy of us2) (size: 4): 2 3 1 4
-// us4 (moved, should be empty) (size: 0):
-// us5 (moved from us4) (size: 4): 4 1 3 2
-// us2 after insert and erase (size: 7): 8 7 6 5 2 3 4
-// us3 after clear (size: 0):
-// us2 contains 5? Yes
-// Found element 6 in us2: 6
-// us2 using iterators (unordered, no order guaranteed): 8 7 6 5 2 3 4
-// us2 after swap (size: 3): 300 200 100
-// swap_set after swap (size: 7): 8 7 6 5 2 3 4
-// us2 empty? No
-// us2 size: 3
+// --- PRIORITY QUEUE ---
+// Top (max): 70
+// Top after pop: 50
+// Size: 3
