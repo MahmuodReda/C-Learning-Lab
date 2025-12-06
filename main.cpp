@@ -1,91 +1,55 @@
 #include <iostream>
-#include <vector>
-#include <memory>
+#include <map>
+#include <string>
 
-// Interface (pure abstract class)
-class Drawable
-{
-public:
-  virtual void draw() const = 0; // must be implemented
-  virtual ~Drawable() {}
-};
-
-// Base class holding common data
-class Shape
-{
-protected:
-  std::string name;
-
-public:
-  Shape(const std::string &n) : name(n) {}
-  virtual ~Shape() {}
-};
-
-// Circle inherits Shape + implements Drawable
-class Circle : public Shape, public Drawable
-{
-private:
-  double radius;
-
-public:
-  Circle(double r) : Shape("Circle"), radius(r) {}
-
-  void draw() const override
-  {
-    std::cout << "Drawing Circle with radius = " << radius << "\n";
-  }
-};
-
-// Rectangle inherits Shape + implements Drawable
-class Rectangle : public Shape, public Drawable
-{
-private:
-  double w, h;
-
-public:
-  Rectangle(double width, double height)
-      : Shape("Rectangle"), w(width), h(height) {}
-
-  void draw() const override
-  {
-    std::cout << "Drawing Rectangle ("
-              << w << " x " << h << ")\n";
-  }
-};
-
-// Triangle inherits Shape + implements Drawable
-class Triangle : public Shape, public Drawable
-{
-private:
-  double a, b, c;
-
-public:
-  Triangle(double x, double y, double z)
-      : Shape("Triangle"), a(x), b(y), c(z) {}
-
-  void draw() const override
-  {
-    std::cout << "Drawing Triangle with sides: "
-              << a << ", " << b << ", " << c << "\n";
-  }
-};
-
-// Test
 int main()
 {
-  // Polymorphic collection of Drawable*
-  std::vector<std::unique_ptr<Drawable>> objects;
+  // ====== MAP (unique keys, ordered) ======
+  std::map<int, std::string> mp;
 
-  objects.push_back(std::make_unique<Circle>(5));
-  objects.push_back(std::make_unique<Rectangle>(3, 6));
-  objects.push_back(std::make_unique<Triangle>(3, 4, 5));
+  mp.insert({3, "Three"}); // insert element
+  mp[1] = "One";           // insert using operator[]
+  mp.emplace(2, "Two");    // emplace (construct in-place)
 
-  // Polymorphism: call draw() through Drawable*
-  for (const auto &obj : objects)
-    obj->draw();
+  // Access element
+  std::cout << "mp[1] = " << mp[1] << "\n"; // operator[]
+
+  // Find element
+  auto it = mp.find(2); // O(log n)
+  if (it != mp.end())
+    std::cout << "Found key 2  : " << it->second << "\n";
+
+  // Loop ordered
+  std::cout << "\nMAP elements (ordered):\n";
+  for (const auto &p : mp)
+    std::cout << p.first << " : " << p.second << "\n";
+
+  // Erase element
+  mp.erase(3); // remove by key
+
+  // Count (always 0 or 1 in map)
+  std::cout << "Count(1) = " << mp.count(1) << "\n";
+
+  // ====== MULTIMAP (duplicate keys allowed, ordered) ======
+  std::multimap<int, std::string> mmp;
+
+  mmp.insert({10, "Apple"});
+  mmp.insert({10, "Orange"}); // duplicate key allowed
+  mmp.emplace(5, "Banana");
+
+  // Count: can be > 1
+  std::cout << "\nMULTIMAP Count(10) = " << mmp.count(10) << "\n";
+
+  // Range lookup for all values with same key
+  auto range = mmp.equal_range(10); // returns pair of iterators
+  std::cout << "\nMULTIMAP values with key 10:\n";
+  for (auto i = range.first; i != range.second; ++i)
+    std::cout << i->first << " : " << i->second << "\n";
+
+  // Loop entire container
+  std::cout << "\nMULTIMAP elements (ordered):\n";
+  for (const auto &p : mmp)
+    std::cout << p.first << " : " << p.second << "\n";
 
   return 0;
 }
-// Drawing Circle with radius = 5
-// Drawing Rectangle (3 x 6)
-// Drawing Triangle with sides: 3, 4, 5
