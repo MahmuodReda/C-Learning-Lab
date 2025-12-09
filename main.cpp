@@ -2,267 +2,252 @@
 #include <algorithm>
 #include <vector>
 #include <numeric>
-#include <iterator>
-#include <random>
 #include <string>
+#include <iterator>
+using namespace std;
 
 int main()
 {
+  cout << "\n================ 15) reverse =================\n";
+  vector<int> v15 = {1, 2, 3, 4, 5};
 
-  // Initial vector
-  std::vector<int> v = {5, 1, 4, 2, 8};
-  std::cout << "Original vector: ";
-  for (int x : v)
-    std::cout << x << " ";
-  std::cout << "\n\n";
+  // reverse(): reverses elements inside a range
+  reverse(v15.begin(), v15.end());
 
-  // ------------------------------------------------------------
-  // 1) sort
-  std::sort(v.begin(), v.end());
-  std::cout << "1) sort: ";
-  for (int x : v)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "Reversed: ";
+  for (int x : v15)
+    cout << x << " ";
+  cout << "\n";
 
-  // 2) reverse
-  std::reverse(v.begin(), v.end());
-  std::cout << "2) reverse: ";
-  for (int x : v)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "\n================ 16) rotate =================\n";
+  vector<int> v16 = {10, 20, 30, 40, 50};
 
-  // 3) stable_sort
-  std::stable_sort(v.begin(), v.end());
-  std::cout << "3) stable_sort: ";
-  for (int x : v)
-    std::cout << x << " ";
-  std::cout << "\n";
+  // rotate(first, middle, last):
+  // Places element at 'middle' as the first element
+  rotate(v16.begin(), v16.begin() + 2, v16.end());
 
-  // ------------------------------------------------------------
-  // SEARCHING ALGORITHMS
-  // ------------------------------------------------------------
+  cout << "Rotated: ";
+  for (int x : v16)
+    cout << x << " ";
+  cout << "\n";
 
-  // 4) find
-  auto f1 = std::find(v.begin(), v.end(), 4);
-  std::cout << "4) find(4): " << (f1 != v.end() ? "found" : "not found") << "\n";
+  cout << "\n================ 17) next_permutation =================\n";
+  vector<int> v17 = {1, 2, 3};
 
-  // 5) find_if
-  auto f2 = std::find_if(v.begin(), v.end(), [](int x)
-                         { return x > 3; });
-  std::cout << "5) find_if(x>3): " << (f2 != v.end() ? std::to_string(*f2) : "none") << "\n";
+  // next_permutation(): generates next lexicographical permutation
+  do
+  {
+    for (int x : v17)
+      cout << x << " ";
+    cout << "\n";
+  } while (next_permutation(v17.begin(), v17.end()));
 
-  // 6) find_if_not
-  auto f3 = std::find_if_not(v.begin(), v.end(), [](int x)
-                             { return x < 4; });
-  std::cout << "6) find_if_not(x<4): " << (f3 != v.end() ? std::to_string(*f3) : "none") << "\n";
+  cout << "\n================ 18) prev_permutation =================\n";
+  vector<int> v18 = {3, 2, 1};
 
-  // ------------------------------------------------------------
-  // COUNTING
-  // ------------------------------------------------------------
+  // prev_permutation(): generates previous lexicographical permutation
+  do
+  {
+    for (int x : v18)
+      cout << x << " ";
+    cout << "\n";
+  } while (prev_permutation(v18.begin(), v18.end()));
 
-  // 7) count
-  int c1 = std::count(v.begin(), v.end(), 2);
-  std::cout << "7) count(2): " << c1 << "\n";
+  cout << "\n================ 19) remove_if =================\n";
+  vector<int> v19 = {1, 2, 3, 4, 5, 6, 7, 8};
 
-  // 8) count_if
-  int c2 = std::count_if(v.begin(), v.end(), [](int x)
-                         { return x % 2 == 0; });
-  std::cout << "8) count_if(even): " << c2 << "\n";
+  // remove_if(): moves elements that do NOT match the condition to the front
+  // Here we remove even numbers → return new logical end
+  v19.erase(remove_if(v19.begin(), v19.end(),
+                      [](int x)
+                      { return x % 2 == 0; }),
+            v19.end());
 
-  // ------------------------------------------------------------
-  // CONDITION CHECKS
-  // ------------------------------------------------------------
+  cout << "After removing even numbers: ";
+  for (int x : v19)
+    cout << x << " ";
+  cout << "\n";
 
-  // 9) all_of
-  std::cout << "9) all_of(>0): "
-            << std::all_of(v.begin(), v.end(), [](int x)
-                           { return x > 0; })
-            << "\n";
+  cout << "\n================ 20) unique =================\n";
+  vector<int> v20 = {1, 1, 2, 2, 3, 3, 3, 4};
 
-  // 10) any_of
-  std::cout << "10) any_of(>5): "
-            << std::any_of(v.begin(), v.end(), [](int x)
-                           { return x > 5; })
-            << "\n";
+  // unique(): removes consecutive duplicates only
+  auto ut = unique(v20.begin(), v20.end());
+  v20.erase(ut, v20.end());
 
-  // 11) none_of
-  std::cout << "11) none_of(==100): "
-            << std::none_of(v.begin(), v.end(), [](int x)
-                            { return x == 100; })
-            << "\n";
+  cout << "Unique elements: ";
+  for (int x : v20)
+    cout << x << " ";
+  cout << "\n";
 
-  // ------------------------------------------------------------
-  // MIN / MAX
-  // ------------------------------------------------------------
+  cout << "\n================ 21) partition =================\n";
+  vector<int> v21 = {1, 2, 3, 4, 5, 6};
 
-  // 12) min_element
-  auto mn = std::min_element(v.begin(), v.end());
-  std::cout << "12) min_element: " << *mn << "\n";
+  // partition(): groups elements by predicate (order is not preserved)
+  partition(v21.begin(), v21.end(),
+            [](int x)
+            { return x % 2 == 0; });
 
-  // 13) max_element
-  auto mx = std::max_element(v.begin(), v.end());
-  std::cout << "13) max_element: " << *mx << "\n";
+  cout << "Partition (evens first): ";
+  for (int x : v21)
+    cout << x << " ";
+  cout << "\n";
 
-  // 14) minmax_element
-  auto mm = std::minmax_element(v.begin(), v.end());
-  std::cout << "14) minmax_element: min=" << *mm.first << ", max=" << *mm.second << "\n";
+  cout << "\n================ 22) stable_partition =================\n";
+  vector<int> v22 = {1, 2, 3, 4, 5, 6};
 
-  // ------------------------------------------------------------
-  // MODIFY ELEMENTS
-  // ------------------------------------------------------------
+  // stable_partition(): preserves relative order of elements
+  stable_partition(v22.begin(), v22.end(),
+                   [](int x)
+                   { return x % 2 == 0; });
 
-  // 15) for_each
-  std::cout << "15) for_each (*2): ";
-  std::for_each(v.begin(), v.end(), [](int &x)
-                { x *= 2; });
-  for (int x : v)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "Stable partition: ";
+  for (int x : v22)
+    cout << x << " ";
+  cout << "\n";
 
-  // 16) transform
-  std::vector<int> t(v.size());
-  std::transform(v.begin(), v.end(), t.begin(), [](int x)
-                 { return x + 1; });
-  std::cout << "16) transform (+1): ";
-  for (int x : t)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "\n================ 23) nth_element =================\n";
+  vector<int> v23 = {9, 1, 8, 2, 7, 3, 6, 4, 5};
 
-  // ------------------------------------------------------------
-  // REMOVE / REMOVE_IF
-  // ------------------------------------------------------------
+  // nth_element(): rearranges so that nth element is in its final sorted position
+  nth_element(v23.begin(), v23.begin() + 4, v23.end());
 
-  // 17) remove (logical remove — then erase)
-  std::vector<int> rm = {1, 2, 3, 2, 4, 2, 5};
-  rm.erase(std::remove(rm.begin(), rm.end(), 2), rm.end());
-  std::cout << "17) remove(2): ";
-  for (int x : rm)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "5th smallest element = " << v23[4] << "\n";
 
-  // 18) remove_if
-  std::vector<int> rm2 = {1, 2, 3, 4, 5, 6};
-  rm2.erase(std::remove_if(rm2.begin(), rm2.end(), [](int x)
-                           { return x % 2 == 0; }),
-            rm2.end());
-  std::cout << "18) remove_if(even): ";
-  for (int x : rm2)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "\n================ 24) partial_sort =================\n";
+  vector<int> v24 = {9, 5, 7, 3, 8, 1, 2, 6};
 
-  // ------------------------------------------------------------
-  // UNIQUE
-  // ------------------------------------------------------------
+  // partial_sort(): sort only first N elements
+  partial_sort(v24.begin(), v24.begin() + 4, v24.end());
 
-  // 19) unique
-  std::vector<int> u = {1, 1, 2, 2, 2, 3, 3, 4};
-  u.erase(std::unique(u.begin(), u.end()), u.end());
-  std::cout << "19) unique: ";
-  for (int x : u)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "First 4 sorted: ";
+  for (int x : v24)
+    cout << x << " ";
+  cout << "\n";
 
-  // ------------------------------------------------------------
-  // BINARY SEARCH FAMILY
-  // ------------------------------------------------------------
+  cout << "\n================ 25) iota =================\n";
+  vector<int> v25(10);
 
-  std::vector<int> b = {1, 2, 2, 2, 3, 4, 5};
-  std::cout << "\nBinary search vector: ";
-  for (int x : b)
-    std::cout << x << " ";
-  std::cout << "\n";
+  // iota(): fill with increasing values starting from X
+  iota(v25.begin(), v25.end(), 100);
 
-  // 20) binary_search
-  bool exists = std::binary_search(b.begin(), b.end(), 3);
-  std::cout << "20) binary_search(3): " << exists << "\n";
+  cout << "iota: ";
+  for (int x : v25)
+    cout << x << " ";
+  cout << "\n";
 
-  // 21) lower_bound
-  auto lb = std::lower_bound(b.begin(), b.end(), 2);
-  std::cout << "21) lower_bound(2): index=" << (lb - b.begin()) << "\n";
+  cout << "\n================ 26) replace =================\n";
+  vector<int> v26 = {1, 2, 3, 4, 5};
 
-  // 22) upper_bound
-  auto ub = std::upper_bound(b.begin(), b.end(), 2);
-  std::cout << "22) upper_bound(2): index=" << (ub - b.begin()) << "\n";
+  // replace(): replace all occurrences of a value
+  replace(v26.begin(), v26.end(), 3, 99);
 
-  // ------------------------------------------------------------
-  // MISMATCH
-  // ------------------------------------------------------------
+  cout << "replace 3 → 99: ";
+  for (int x : v26)
+    cout << x << " ";
+  cout << "\n";
 
-  // 23) mismatch
-  std::vector<int> m1 = {1, 2, 3, 4};
-  std::vector<int> m2 = {1, 2, 0, 4};
-  auto mis = std::mismatch(m1.begin(), m1.end(), m2.begin());
-  std::cout << "23) mismatch: first diff = ("
-            << *mis.first << ", " << *mis.second << ")\n";
+  cout << "\n================ 27) transform =================\n";
+  vector<int> v27 = {1, 2, 3, 4, 5};
+  vector<int> out27(5);
 
-  // ------------------------------------------------------------
-  // ACCUMULATE (sum)
-  // ------------------------------------------------------------
+  // transform(): apply function to each element
+  transform(v27.begin(), v27.end(), out27.begin(),
+            [](int x)
+            { return x * x; });
 
-  // 24) accumulate
-  int sum = std::accumulate(b.begin(), b.end(), 0);
-  std::cout << "24) accumulate(sum): " << sum << "\n";
+  cout << "Squares: ";
+  for (int x : out27)
+    cout << x << " ";
+  cout << "\n";
 
-  // ------------------------------------------------------------
-  // FILL / GENERATE / RANDOM SHUFFLE
-  // ------------------------------------------------------------
+  cout << "\n================ 28) copy_if =================\n";
+  vector<int> v28 = {1, 2, 3, 4, 5, 6, 7, 8};
+  vector<int> out28;
 
-  // 25) fill
-  std::vector<int> f(5);
-  std::fill(f.begin(), f.end(), 7);
-  std::cout << "25) fill with 7: ";
-  for (int x : f)
-    std::cout << x << " ";
-  std::cout << "\n";
+  // copy_if(): copy only elements matching predicate
+  copy_if(v28.begin(), v28.end(), back_inserter(out28),
+          [](int x)
+          { return x > 4; });
 
-  // 26) generate
-  int counter = 1;
-  std::vector<int> g(5);
-  std::generate(g.begin(), g.end(), [&counter]()
-                { return counter++; });
-  std::cout << "26) generate (1..5): ";
-  for (int x : g)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "copy_if (>4): ";
+  for (int x : out28)
+    cout << x << " ";
+  cout << "\n";
 
-  // 27) shuffle
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::shuffle(g.begin(), g.end(), gen);
-  std::cout << "27) shuffle: ";
-  for (int x : g)
-    std::cout << x << " ";
-  std::cout << "\n";
+  cout << "\n================ 29) accumulate =================\n";
+  vector<int> v29 = {10, 20, 30};
+
+  // accumulate(): sum elements
+  int total = accumulate(v29.begin(), v29.end(), 0);
+
+  cout << "accumulate = " << total << "\n";
+
+  cout << "\n================ 30) equal =================\n";
+  vector<int> v30a = {1, 2, 3, 4};
+  vector<int> v30b = {1, 2, 3, 4};
+
+  // equal(): compares two ranges
+  bool same = equal(v30a.begin(), v30a.end(), v30b.begin());
+
+  cout << "equal result = " << boolalpha << same << "\n";
 
   return 0;
 }
+// ================ 15) reverse =================
+// Reversed: 5 4 3 2 1
 
-// 1) sort: 1 2 4 5 8
-// 2) reverse: 8 5 4 2 1
-// 3) stable_sort: 1 2 4 5 8
-// 4) find(4): found
-// 5) find_if(x>3): 4
-// 6) find_if_not(x<4): 4
-// 7) count(2): 1
-// 8) count_if(even): 3
-// 9) all_of(>0): 1
-// 10) any_of(>5): 1
-// 11) none_of(==100): 1
-// 12) min_element: 1
-// 13) max_element: 8
-// 14) minmax_element: min=1, max=8
-// 15) for_each (*2): 2 4 8 10 16
-// 16) transform (+1): 3 5 9 11 17
-// 17) remove(2): 1 3 4 5
-// 18) remove_if(even): 1 3 5
-// 19) unique: 1 2 3 4
+// ================ 16) rotate =================
+// Rotated: 30 40 50 10 20
 
-// Binary search vector: 1 2 2 2 3 4 5
-// 20) binary_search(3): 1
-// 21) lower_bound(2): index=1
-// 22) upper_bound(2): index=4
-// 23) mismatch: first diff = (3, 0)
-// 24) accumulate(sum): 19
-// 25) fill with 7: 7 7 7 7 7
-// 26) generate (1..5): 1 2 3 4 5
-// 27) shuffle: 4 1 5 2 3
+// ================ 17) next_permutation =================
+// 1 2 3
+// 1 3 2
+// 2 1 3
+// 2 3 1
+// 3 1 2
+// 3 2 1
+
+// ================ 18) prev_permutation =================
+// 3 2 1
+// 3 1 2
+// 2 3 1
+// 2 1 3
+// 1 3 2
+// 1 2 3
+
+// ================ 19) remove_if =================
+// After removing even numbers: 1 3 5 7
+
+// ================ 20) unique =================
+// Unique elements: 1 2 3 4
+
+// ================ 21) partition =================
+// Partition (evens first): 6 2 4 3 5 1
+
+// ================ 22) stable_partition =================
+// Stable partition: 2 4 6 1 3 5
+
+// ================ 23) nth_element =================
+// 5th smallest element = 5
+
+// ================ 24) partial_sort =================
+// First 4 sorted: 1 2 3 5 9 8 7 6
+
+// ================ 25) iota =================
+// iota: 100 101 102 103 104 105 106 107 108 109
+
+// ================ 26) replace =================
+// replace 3 ظْ 99: 1 2 99 4 5
+
+// ================ 27) transform =================
+// Squares: 1 4 9 16 25
+
+// ================ 28) copy_if =================
+// copy_if (>4): 5 6 7 8
+
+// ================ 29) accumulate =================
+// accumulate = 60
+
+// ================ 30) equal =================
+// equal result = true
