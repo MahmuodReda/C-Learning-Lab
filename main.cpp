@@ -1,11 +1,10 @@
 /********************************************************************
- * PART 1: std::unique_ptr with int
+ * PART 2: std::shared_ptr with int
  * ------------------------------------------------------------------
  * Demonstrates:
- * - Heap allocation of a primitive type (int)
- * - Exclusive ownership
- * - Move semantics
- * - Automatic deletion
+ * - Heap allocation
+ * - Shared ownership
+ * - Reference counting
  ********************************************************************/
 
 #include <iostream>
@@ -13,25 +12,26 @@
 
 int main()
 {
-  // Allocate int on HEAP, owned by unique_ptr
-  std::unique_ptr<int> upInt = std::make_unique<int>(10);
+  // Create shared int on HEAP
+  std::shared_ptr<int> spInt1 = std::make_shared<int>(100);
 
-  // Access the value
-  std::cout << "Value via unique_ptr<int>: " << *upInt << "\n";
+  std::cout << "Value: " << *spInt1 << "\n";
+  std::cout << "Use count: " << spInt1.use_count() << "\n";
 
-  // Transfer ownership using std::move
-  std::unique_ptr<int> upInt2 = std::move(upInt);
-
-  // After move, upInt no longer owns the resource
-  if (!upInt)
   {
-    std::cout << "upInt is nullptr after move\n";
-  }
+    // Copy shared_ptr (increase reference count)
+    std::shared_ptr<int> spInt2 = spInt1;
 
-  // Modify value through new owner
-  *upInt2 = 20;
-  std::cout << "Modified value: " << *upInt2 << "\n";
+    std::cout << "Use count after copy: "
+              << spInt1.use_count() << "\n";
 
-  // Memory is released automatically when upInt2 goes out of scope
+    *spInt2 = 200;
+  } // spInt2 destroyed
+
+  std::cout << "Use count after scope: "
+            << spInt1.use_count() << "\n";
+  std::cout << "Final value: " << *spInt1 << "\n";
+
+  // Heap memory released when last shared_ptr is destroyed
   return 0;
 }
