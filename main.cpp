@@ -1,58 +1,92 @@
 #include <iostream>
 #include <memory>
 
-//  Original code before insights transformation:
+// /* Original Code Before Insights Transformation */
 // template<typename T>
-// T fun(T a, T b)
+// class container
 // {
-//   return a / b;
-// }
 
-// /* First instantiated from: insights.cpp:11 */
+//   public:
+//   T value;
+//   inline container(T val)
+//   : value(val)
+//   {
+//   }
+
+//   inline void print()
+//   {
+//     (std::cout << this->value) << std::endl;
+//   }
+
+// };
+
+// /* First instantiated from: insights.cpp:15 */
 // #ifdef INSIGHTS_USE_TEMPLATE
 // template<>
-// double fun<double>(double a, double b)
+// class container<int>
 // {
-//   return a / b;
-// }
+
+//   public:
+//   int value;
+//   inline container(int val)
+//   : value{val}
+//   {
+//   }
+
+//   inline void print()
+//   {
+//     std::cout.operator<<(this->value).operator<<(std::endl);
+//   }
+
+// };
+
 // #endif
-
-// /* First instantiated from: insights.cpp:12 */
+// /* First instantiated from: insights.cpp:17 */
 // #ifdef INSIGHTS_USE_TEMPLATE
 // template<>
-// int fun<int>(int a, int b)
+// class container<double>
 // {
-//   return a / b;
-// }
-// #endif
 
-// /* First instantiated from: insights.cpp:13 */
-// #ifdef INSIGHTS_USE_TEMPLATE
-// template<>
-// float fun<float>(float a, float b)
-// {
-//   return a / b;
-// }
+//   public:
+//   double value;
+//   inline container(double val)
+//   : value{val}
+//   {
+//   }
+
+//   inline void print()
+//   {
+//     std::cout.operator<<(this->value).operator<<(std::endl);
+//   }
+
+// };
+
 // #endif
 
 // int main()
 // {
-//   std::cout.operator<<(fun(1.0, 2.0)).operator<<(std::endl);
-//   std::cout.operator<<(fun(5, 2)).operator<<(std::endl);
-//   std::cout.operator<<(fun(5.0F, 2.0F)).operator<<(std::endl);
+//   container<int> c1 = container<int>(10);
+//   c1.print();
+//   container<double> c2 = container<double>(3.1400000000000001);
+//   c2.print();
 //   return 0;
 // }
-
 template <typename T>
-T fun(T a, T b)
+class container
 {
-  return a / b;
-}
+public:
+  T value;
+
+  container(T val) : value(val) {}
+  void print() { std::cout << value << std::endl; }
+};
+
 int main()
 {
-  std::cout << fun(1.0, 2.0) << std::endl;
-  std::cout << fun(5, 2) << std::endl;
-  std::cout << fun(5.0f, 2.0f) << std::endl;
+  container<int> c1(10);
+  c1.print();
+  container<double> c2(3.14);
+  c2.print();
 
   return 0;
 }
