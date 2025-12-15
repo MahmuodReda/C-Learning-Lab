@@ -1,90 +1,78 @@
 #include <iostream>
 
-// original code
+// original code with comments showing insights output
 
-// template<class T>
-// class Box
+// template<typename T, typename U>
+// struct Pair
 // {
-
-//   public:
-//   inline Box(T v)
+//   static inline void print()
 //   {
-//     std::operator<<(std::cout, "Generic Box\n");
+//     std::operator<<(std::cout, "Primary template\n");
 //   }
 
 // };
 
-// /* First instantiated from: insights.cpp:26 */
+// /* First instantiated from: insights.cpp:23 */
 // #ifdef INSIGHTS_USE_TEMPLATE
 // template<>
-// class Box<int>
+// struct Pair<float, double>
 // {
-
-//   public:
-//   inline Box(int v)
+//   static inline void print()
 //   {
-//     std::operator<<(std::cout, "Generic Box\n");
+//     std::operator<<(std::cout, "Primary template\n");
 //   }
 
 // };
 
 // #endif
-// /* First instantiated from: insights.cpp:28 */
+// /* First instantiated from: insights.cpp:24 */
 // #ifdef INSIGHTS_USE_TEMPLATE
 // template<>
-// class Box<double>
+// struct Pair<char, int>
 // {
-
-//   public:
-//   inline Box(double v)
+//   static inline void print()
 //   {
-//     std::operator<<(std::cout, "Generic Box\n");
+//     std::operator<<(std::cout, "Partial specialization: U = int\n");
 //   }
 
 // };
 
 // #endif
 
-// template<>
-// class Box<float>
+// template<typename T>
+// struct Pair<T, int>
 // {
-
-//   public:
-//   inline Box(float v)
+//   static inline void print()
 //   {
-//     std::operator<<(std::cout, "Float Box (Specialized)\n");
+//     std::operator<<(std::cout, "Partial specialization: U = int\n");
 //   }
 
 // };
 
-template <class T>
-class Box
+// Primary template
+template <typename T, typename U>
+struct Pair
 {
-public:
-  Box(T v)
+  static void print()
   {
-    std::cout << "Generic Box\n";
+    std::cout << "Primary template\n";
   }
 };
-
-template <>
-class Box<float>
+template <typename T>
+struct Pair<T, int>
 {
-public:
-  Box(float v)
+  static void print()
   {
-    std::cout << "Float Box (Specialized)\n";
+    std::cout << "Partial specialization: U = int\n";
   }
 };
 
 int main()
 {
+  Pair<float, double>::print(); // Primary template
+  Pair<char, int>::print();     // Partial specialization
 
-  Box<int> a(5);      // Generic Box
-  Box<float> b(3.5f); // Float Box (Specialized)
-  Box c(1.2);         // Generic Box
   return 0;
 }
-// Generic Box
-// Float Box (Specialized)
-// Generic Box
+// Primary template
+// Partial specialization: U = int
