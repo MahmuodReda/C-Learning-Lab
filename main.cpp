@@ -1,94 +1,132 @@
+/********************************************************************
+ * Comprehensive std::tuple Example
+ * ------------------------------------------------------------------
+ * This example demonstrates most common and important usages of
+ * std::tuple in C++:
+ *
+ * 1) Creating a tuple with heterogeneous types
+ * 2) Accessing elements by index using std::get
+ * 3) Modifying tuple elements
+ * 4) Accessing nested objects inside a tuple
+ * 5) Querying tuple size at compile time
+ * 6) Using std::tie to unpack a tuple
+ * 7) Using std::make_tuple
+ * 8) Structured bindings (C++17)
+ * 9) Using tuple as a return type
+ ********************************************************************/
+
+#include <tuple>
+#include <vector>
+#include <string>
 #include <iostream>
 
-// original code before insights transformation
-
-// template<typename T>
-// void print(T t)
-// {
-//   (std::cout << t) << std::endl;
-// }
-
-// /* First instantiated from: insights.cpp:12 */
-// #ifdef INSIGHTS_USE_TEMPLATE
-// template<>
-// void print<float>(float t)
-// {
-//   std::cout.operator<<(t).operator<<(std::endl);
-// }
-// #endif
-
-// template<typename T, typename ... Args>
-// void print(T t, Args... arg)
-// {
-//   std::cout << t;
-//   std::operator<<(std::cout, " SIZE : ").operator<<(sizeof...(arg)).operator<<(std::endl);
-//   print(arg... );
-// }
-
-// /* First instantiated from: insights.cpp:17 */
-// #ifdef INSIGHTS_USE_TEMPLATE
-// template<>
-// void print<int, double, const char *, float>(int t, double __arg1, const char * __arg2, float __arg3)
-// {
-//   std::cout.operator<<(t);
-//   std::operator<<(std::cout, " SIZE : ").operator<<(3).operator<<(std::endl);
-//   print(__arg1, __arg2, __arg3);
-// }
-// #endif
-
-// /* First instantiated from: insights.cpp:12 */
-// #ifdef INSIGHTS_USE_TEMPLATE
-// template<>
-// void print<double, const char *, float>(double t, const char * __arg1, float __arg2)
-// {
-//   std::cout.operator<<(t);
-//   std::operator<<(std::cout, " SIZE : ").operator<<(2).operator<<(std::endl);
-//   print(__arg1, __arg2);
-// }
-// #endif
-
-// /* First instantiated from: insights.cpp:12 */
-// #ifdef INSIGHTS_USE_TEMPLATE
-// template<>
-// void print<const char *, float>(const char * t, float __arg1)
-// {
-//   std::operator<<(std::cout, t);
-//   std::operator<<(std::cout, " SIZE : ").operator<<(1).operator<<(std::endl);
-//   print(__arg1);
-// }
-// #endif
-
-// #ifdef INSIGHTS_USE_TEMPLATE
-// template<>
-// void print<float>(float t);
-// #endif
-
-template <typename T>
-void print(T t)
+/********************************************************************
+ * Function returning multiple values using std::tuple
+ ********************************************************************/
+std::tuple<int, double, std::string> createData()
 {
-  std::cout << t << std::endl;
-}
-template <typename T, typename... Args>
-void print(T t, Args... arg)
-{
-  std::cout << t;
-  std::cout << " SIZE : " << sizeof...(arg) << std::endl;
-  print(arg...);
+  return std::make_tuple(42, 3.14, "Pi");
 }
 
 int main()
 {
-  print(1, 2.5, "Hello", 3.5f);
+  /****************************************************************
+   * 1) Creating a tuple with different types
+   ****************************************************************/
+  std::tuple<int, float, std::string, std::vector<int>> t{
+      1,
+      2.0f,
+      "Hello",
+      {1, 2, 3}};
+
+  /****************************************************************
+   * 2) Accessing tuple elements using std::get<index>
+   *    Index is compile-time constant
+   ****************************************************************/
+  std::cout << "Element 0 (int): " << std::get<0>(t) << std::endl;
+  std::cout << "Element 1 (float): " << std::get<1>(t) << std::endl;
+  std::cout << "Element 2 (string): " << std::get<2>(t) << std::endl;
+
+  /****************************************************************
+   * 3) Modifying tuple elements
+   ****************************************************************/
+  std::get<0>(t) = 10;
+  std::get<2>(t) = "World";
+
+  std::cout << "Modified element 0: " << std::get<0>(t) << std::endl;
+  std::cout << "Modified element 2: " << std::get<2>(t) << std::endl;
+
+  /****************************************************************
+   * 4) Accessing nested containers inside a tuple
+   ****************************************************************/
+  std::cout << "First element of vector inside tuple: "
+            << std::get<3>(t)[0] << std::endl;
+
+  /****************************************************************
+   * 5) Getting tuple size at compile time
+   ****************************************************************/
+  std::cout << "Tuple size: "
+            << std::tuple_size<decltype(t)>::value << std::endl;
+
+  /****************************************************************
+   * 6) Unpacking a tuple using std::tie
+   ****************************************************************/
+  int a;
+  float b;
+  std::string c;
+  std::vector<int> d;
+
+  std::tie(a, b, c, d) = t;
+
+  std::cout << "Unpacked values via std::tie:\n";
+  std::cout << "a = " << a << ", b = " << b
+            << ", c = " << c << ", d[1] = " << d[1] << std::endl;
+
+  /****************************************************************
+   * 7) Creating tuple using std::make_tuple
+   ****************************************************************/
+  auto t2 = std::make_tuple(5, 'A', 9.9);
+
+  std::cout << "t2 values: "
+            << std::get<0>(t2) << ", "
+            << std::get<1>(t2) << ", "
+            << std::get<2>(t2) << std::endl;
+
+  /****************************************************************
+   * 8) Structured bindings (C++17)
+   *    Automatically unpack tuple into variables
+   ****************************************************************/
+  auto [id, value, name] = createData();
+
+  std::cout << "Structured binding result:\n";
+  std::cout << "id = " << id
+            << ", value = " << value
+            << ", name = " << name << std::endl;
+
+  /****************************************************************
+   * 9) Using tuple as a return type
+   ****************************************************************/
+  auto result = createData();
+
+  std::cout << "Returned tuple values:\n";
+  std::cout << std::get<0>(result) << ", "
+            << std::get<1>(result) << ", "
+            << std::get<2>(result) << std::endl;
 
   return 0;
 }
-// print(1, 2.5, "Hello", 3.5f)
-//  └── print(2.5, "Hello", 3.5f)
-//       └── print("Hello", 3.5f)
-//            └── print(3.5f)
-//                 └── base case
 
-// 1 SIZE : 3
-// 2.5 SIZE : 2
-// Hello SIZE : 1
-// 3.5
+// Element 0 (int): 1
+// Element 1 (float): 2
+// Element 2 (string): Hello
+// Modified element 0: 10
+// Modified element 2: World
+// First element of vector inside tuple: 1
+// Tuple size: 4
+// Unpacked values via std::tie:
+// a = 10, b = 2, c = World, d[1] = 2
+// t2 values: 5, A, 9.9
+// Structured binding result:
+// id = 42, value = 3.14, name = Pi
+// Returned tuple values:
+// 42, 3.14, Pi
