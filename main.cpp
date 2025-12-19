@@ -1,81 +1,49 @@
 #include <iostream> // For std::cout
 #include <thread>   // For std::thread
 #include <chrono>   // For sleep_for, seconds, milliseconds
+#include <random>
+#include <iterator>
+#include <algorithm>
+#include <c++/15.2.0/array>
+#include <c++/15.2.0/bits/chrono.h>
+#include <c++/15.2.0/bits/std_thread.h>
 
-/*********************************************************************
- * Example 3: Using sleep_for with threads
- *
- * This example demonstrates:
- * 1) Creating multiple threads
- * 2) Pausing thread execution using sleep_for
- * 3) Observing interleaved output between threads
- *********************************************************************/
-
-//---------------------------------------------------------------
-// task()
-// A simple task that:
-// - Prints a start message
-// - Sleeps for 1 second
-// - Prints a finish message
-//---------------------------------------------------------------
-void task(int id)
+void task3(int id)
 {
-  // Print which thread has started
-  std::cout << "Thread " << id << " started\n";
+  std::cout << "Task " << id << " is starting.\n"; // Task 1 is starting.
+  std::random_device rd;                           // Obtain a random number from hardware
+  std::mt19937 gen(rd());                          // Seed the generator
+  std::uniform_int_distribution<int> dist(1, 5);   // Define the range
+  std::cout << dist(gen) << " " << std::endl;
 
-  // Pause the current thread for 1 second
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  auto start = std::chrono::steady_clock::now();                    // Record start time
+  auto next = std::chrono::steady_clock::now();                     // Get current time
+  std::cout << "next: " << next.time_since_epoch().count() << "\n"; // next: 514050732527200
+  next += std::chrono::seconds(10);                                 // Schedule wake-up time 10 seconds later
+  std::cout << "next: " << next.time_since_epoch().count() << "\n"; // next: 514060732527200
 
-  // Print when the thread finishes execution
-  std::cout << "Thread " << id << " finished\n";
+  std::this_thread::sleep_for(std::chrono::seconds(dist(gen))); // Sleep for a random duration between 1 and 5 seconds
+
+  std::this_thread::sleep_until(next); // Sleep until the scheduled wake-up time
+
+  std::cout << "Awake now!\n";                 // Awake now!
+  auto end = std::chrono::steady_clock::now(); // Record end time
+  auto elapsed = end - start;                  // Calculate elapsed time
+  std::cout << "Elapsed time: "
+            << std::chrono::duration_cast<std::chrono::seconds>(elapsed).count()
+            << " seconds\n"; // Elapsed time: 10 seconds
 }
-
-//---------------------------------------------------------------
-// task2()
-// A longer task that:
-// - Runs a loop 10 times
-// - Sleeps for 100 ms in each iteration
-// - Prints progress information
-//---------------------------------------------------------------
-void task2(int id)
-{
-  for (int i = 0; i < 10; i++)
-  {
-    // Pause the current thread for 100 milliseconds
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    // Print current progress of the thread
-    std::cout << "Thread " << id << " working: " << i << "\n";
-  }
-}
-
 int main()
 {
-  // Create first thread running task()
-  std::thread t1(task, 1);
+  std::thread t1(task3, 1); // Start task3 in a new thread with id 1
 
-  // Create second thread running task2()
-  std::thread t2(task2, 2);
-
-  // Wait for t1 to finish execution
-  // join() blocks the main thread until t1 completes
-  t1.join();
-
-  // Wait for t2 to finish execution
-  t2.join();
-
+  t1.join(); // Wait for thread t1 to finish
   // Program ends only after both threads have finished
   return 0;
 }
-// Thread 1 started
-// Thread 2 working: 0
-// Thread 2 working: 1
-// Thread 2 working: 2
-// Thread 2 working: 3
-// Thread 2 working: 4
-// Thread 2 working: 5
-// Thread 2 working: 6
-// Thread 2 working: 7
-// Thread 2 working: 8
-// Thread 1 finished
-// Thread 2 working: 9
+// Task 1 is starting.
+// 1
+// next: 514050732527200
+// next: 514060732527200
+// Awake now!
+// Elapsed time: 10 seconds
