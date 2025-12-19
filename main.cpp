@@ -1,162 +1,81 @@
+#include <iostream> // For std::cout
+#include <thread>   // For std::thread
+#include <chrono>   // For sleep_for, seconds, milliseconds
+
 /*********************************************************************
- * THREADING WITH ARGUMENTS – ALL CASES IN ONE FILE
- * ------------------------------------------------
- * This file demonstrates ALL argument-passing cases with std::thread:
+ * Example 3: Using sleep_for with threads
  *
- * 2.1 Pass by value
- * 2.2 Pass multiple arguments
- * 2.3 Pass by reference (WRONG way)
- * 2.4 Pass by reference (CORRECT using std::ref)
- * 2.5 Pass pointer
- * 2.6 Pass object by value
- * 2.7 Pass object by reference
- *
- * All examples are SMALL, ISOLATED, and NUMBERED.
+ * This example demonstrates:
+ * 1) Creating multiple threads
+ * 2) Pausing thread execution using sleep_for
+ * 3) Observing interleaved output between threads
  *********************************************************************/
 
-#include <iostream>
-#include <thread>
-#include <functional> // std::ref
-
-/*********************************************************************
- * 2.1 PASS BY VALUE
- *********************************************************************/
-void byValue(int x)
+//---------------------------------------------------------------
+// task()
+// A simple task that:
+// - Prints a start message
+// - Sleeps for 1 second
+// - Prints a finish message
+//---------------------------------------------------------------
+void task(int id)
 {
-  // Modifies only local copy
-  x += 10;
-  std::cout << "[2.1] byValue x = " << x << std::endl;
+  // Print which thread has started
+  std::cout << "Thread " << id << " started\n";
+
+  // Pause the current thread for 1 second
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+
+  // Print when the thread finishes execution
+  std::cout << "Thread " << id << " finished\n";
 }
 
-/*********************************************************************
- * 2.2 PASS MULTIPLE ARGUMENTS
- *********************************************************************/
-void multipleArgs(int a, double b)
+//---------------------------------------------------------------
+// task2()
+// A longer task that:
+// - Runs a loop 10 times
+// - Sleeps for 100 ms in each iteration
+// - Prints progress information
+//---------------------------------------------------------------
+void task2(int id)
 {
-  std::cout << "[2.2] multipleArgs: " << a << ", " << b << std::endl;
+  for (int i = 0; i < 10; i++)
+  {
+    // Pause the current thread for 100 milliseconds
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    // Print current progress of the thread
+    std::cout << "Thread " << id << " working: " << i << "\n";
+  }
 }
 
-/*********************************************************************
- * 2.3 PASS BY REFERENCE (WRONG)
- * std::thread COPIES arguments by default
- *********************************************************************/
-void byReferenceWrong(int &x)
-{
-  x += 10;
-}
-
-/*********************************************************************
- * 2.4 PASS BY REFERENCE (CORRECT using std::ref)
- *********************************************************************/
-void byReferenceCorrect(int &x)
-{
-  x += 10;
-  std::cout << "[2.4] byReferenceCorrect x = " << x << std::endl;
-}
-
-/*********************************************************************
- * 2.5 PASS POINTER
- *********************************************************************/
-void byPointer(int *x)
-{
-  if (x)
-    (*x) += 10;
-  std::cout << "[2.5] byPointer *x = " << *x << std::endl;
-}
-
-/*********************************************************************
- * Helper struct for object examples
- *********************************************************************/
-struct Data
-{
-  int value;
-};
-
-/*********************************************************************
- * 2.6 PASS OBJECT BY VALUE
- *********************************************************************/
-void objectByValue(Data d)
-{
-  // Modifies COPY
-  d.value = 100;
-  std::cout << "[2.6] objectByValue d.value = " << d.value << std::endl;
-}
-
-/*********************************************************************
- * 2.7 PASS OBJECT BY REFERENCE
- *********************************************************************/
-void objectByReference(Data &d)
-{
-  d.value = 100;
-  std::cout << "[2.7] objectByReference d.value = " << d.value << std::endl;
-}
-
-/*********************************************************************
- * MAIN
- *********************************************************************/
 int main()
 {
-  /******************** 2.1 ********************/
-  int a = 5;
-  std::thread t1(byValue, a);
+  // Create first thread running task()
+  std::thread t1(task, 1);
+
+  // Create second thread running task2()
+  std::thread t2(task2, 2);
+
+  // Wait for t1 to finish execution
+  // join() blocks the main thread until t1 completes
   t1.join();
-  std::cout << "[2.1] main a = " << a << " (unchanged)\n\n";
 
-  // /******************** 2.2 ********************/
-  std::thread t2(multipleArgs, 10, 3.14);
+  // Wait for t2 to finish execution
   t2.join();
-  std::cout << std::endl;
 
-  /******************** 2.3 ********************/
-  /*
-  int b = 5;
-  std::thread t3(byReferenceWrong, b); //  copied, not reference
-  t3.join();
-  std::cout << "[2.3] main b = " << b << " (UNCHANGED)\n\n";
-
-  */
-  // Error expected: cannot bind non-const lvalue reference of type 'int&' to an rvalue of type 'int'
-
-  // /******************** 2.4 ********************/
-  int c = 5;
-  std::thread t4(byReferenceCorrect, std::ref(c)); // ✅ real reference
-  t4.join();
-  std::cout << "[2.4] main c = " << c << " (MODIFIED)\n\n";
-
-  // /******************** 2.5 ********************/
-  int d = 5;
-  std::thread t5(byPointer, &d);
-  t5.join();
-  std::cout << "[2.5] main d = " << d << " (MODIFIED)\n\n";
-
-  // /******************** 2.6 ********************/
-  Data data1{5};
-  std::thread t6(objectByValue, data1); // copy
-  t6.join();
-  std::cout << "[2.6] data1.value = " << data1.value << " (UNCHANGED)\n\n";
-
-  // /******************** 2.7 ********************/
-  Data data2{5};
-  std::thread t7(objectByReference, std::ref(data2));
-  t7.join();
-  std::cout << "[2.7] data2.value = " << data2.value << " (MODIFIED)\n\n";
-
+  // Program ends only after both threads have finished
   return 0;
 }
-
-// [2.1] byValue x = 15
-// [2.1] main a = 5 (unchanged)
-
-// [2.2] multipleArgs: 10, 3.14
-
-// [2.4] byReferenceCorrect x = 15
-// [2.4] main c = 15 (MODIFIED)
-
-// [2.5] byPointer *x = 15
-// [2.5] main d = 15 (MODIFIED)
-
-// [2.6] objectByValue d.value = 100
-// [2.6] data1.value = 5 (UNCHANGED)
-
-// [2.7] objectByReference d.value = 100
-// [2.7] data2.value = 100 (MODIFIED)
+// Thread 1 started
+// Thread 2 working: 0
+// Thread 2 working: 1
+// Thread 2 working: 2
+// Thread 2 working: 3
+// Thread 2 working: 4
+// Thread 2 working: 5
+// Thread 2 working: 6
+// Thread 2 working: 7
+// Thread 2 working: 8
+// Thread 1 finished
+// Thread 2 working: 9
