@@ -2,43 +2,99 @@
 #include <thread>
 #include <future>
 
-/*
-  worker thread:
-  - receives a promise
-  - computes a value
-  - stores the value in the promise
-*/
-void worker(std::promise<int> p)
-{
-  // Simulate heavy computation
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-  int result = 21 * 2;
+/********************************************************************
+ * CASE 7.1 : packaged_task WITHOUT arguments
+ ********************************************************************/
 
-  // Put the result into the promise
-  p.set_value(result);
+// Function with no parameters
+int task_no_args()
+{
+  std::cout << "[task_no_args] Running...\n";
+  return 10;
+}
+
+/********************************************************************
+ * CASE 7.2 : packaged_task WITH one argument
+ ********************************************************************/
+
+// Function with one argument
+int task_one_arg(int x)
+{
+  std::cout << "[task_one_arg] Running with x = " << x << "\n";
+  return x * 2;
+}
+
+/********************************************************************
+ * CASE 7.3 : packaged_task WITH multiple arguments (different types)
+ ********************************************************************/
+
+// Function with multiple arguments of different types
+double task_multi_args(int a, double b)
+{
+  std::cout << "[task_multi_args] Running with a = "
+            << a << ", b = " << b << "\n";
+  return a + b;
 }
 
 int main()
 {
-  // 1) Create a promise object
-  std::promise<int> prom;
+  /****************************************************************
+   * CASE 7.1 : No arguments
+   ****************************************************************/
+  {
+    // Wrap function inside packaged_task
+    std::packaged_task<int()> task(task_no_args);
 
-  // 2) Extract the future from the promise
-  std::future<int> fut = prom.get_future();
+    // Get future associated with the task
+    std::future<int> result = task.get_future();
 
-  // 3) Start a thread and move the promise into it
-  std::thread t(worker, std::move(prom));
+    // Run task in a separate thread
+    std::thread t(std::move(task));
 
-  // 4) Wait for the result (BLOCKING)
-  int value = fut.get();
+    // Wait for result
+    std::cout << "Result (no args): " << result.get() << "\n";
 
-  std::cout << "Received value: " << value << std::endl;
+    t.join();
+  }
 
-  t.join();
+  /****************************************************************
+   * CASE 7.2 : One argument
+   ****************************************************************/
+  {
+    // packaged_task signature must match function signature
+    std::packaged_task<int(int)> task(task_one_arg);
+
+    std::future<int> result = task.get_future();
+
+    // Arguments are passed when thread starts
+    std::thread t(std::move(task), 5);
+
+    std::cout << "Result (one arg): " << result.get() << "\n";
+
+    t.join();
+  }
+
+  /****************************************************************
+   * CASE 7.3 : Multiple arguments (different types)
+   ****************************************************************/
+  {
+    std::packaged_task<double(int, double)> task(task_multi_args);
+
+    std::future<double> result = task.get_future();
+
+    std::thread t(std::move(task), 3, 4.5);
+
+    std::cout << "Result (multi args): " << result.get() << "\n";
+
+    t.join();
+  }
+
   return 0;
 }
 
-// Main thread:   fut.get() --------------(waiting)--------------> value
-// Worker thread:      compute ---> set_value()
-
-// Received value: 42
+// Result (no args): [task_no_args] Running...
+// 10
+// Result (one arg): [task_one_arg] Running with x = 5
+// 10
+// Result (multi args): [task_multi_args] Running with a = 3, b = 4.5
+// 7.5
