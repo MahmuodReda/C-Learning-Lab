@@ -1,124 +1,44 @@
 #include <iostream>
 #include <thread>
-#include <atomic>
-#include <mutex>
+#include <future>
 
-/*********************************************************************
- * DEMO: Race Condition vs Mutex vs Atomic
- *
- * This program compares three cases:
- * 1) No synchronization        -> Race condition (WRONG result)
- * 2) Mutex synchronization     -> Correct but slower
- * 3) Atomic variable           -> Correct and efficient
- *********************************************************************/
-
-/*********************************************************************
- * CASE 1: NO SYNCHRONIZATION (Race Condition)
- *********************************************************************/
-
-// Shared variable accessed by multiple threads
-int counter = 0;
-
-void increment()
+/*
+  worker thread:
+  - receives a promise
+  - computes a value
+  - stores the value in the promise
+*/
+void worker(std::promise<int> p)
 {
-  // Each thread tries to increment the same variable
-  for (int i = 0; i < 100000; ++i)
-  {
-    // NOT atomic:
-    // This operation = read + modify + write
-    // Multiple threads can interleave here
-    counter++;
-  }
-}
+  // Simulate heavy computation
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+  int result = 21 * 2;
 
-/*********************************************************************
- * CASE 2: MUTEX PROTECTION
- *********************************************************************/
-
-// Shared variable protected by a mutex
-int counter1 = 0;
-std::mutex mtx;
-
-void increment1()
-{
-  for (int i = 0; i < 100000; ++i)
-  {
-    // lock_guard locks the mutex at construction
-    // and unlocks it automatically when leaving scope (RAII)
-    std::lock_guard<std::mutex> lock(mtx);
-
-    // Only ONE thread can execute this line at a time
-    counter1++;
-  }
-}
-
-/*********************************************************************
- * CASE 3: ATOMIC VARIABLE
- *********************************************************************/
-
-// Atomic integer guarantees thread-safe operations
-std::atomic<int> counter2{0};
-
-void increment2()
-{
-  for (int i = 0; i < 100000; ++i)
-  {
-    // Atomic increment
-    // Implemented using CPU atomic instructions
-    counter2++;
-  }
+  // Put the result into the promise
+  p.set_value(result);
 }
 
 int main()
 {
-  /*****************************************************************
-   * TEST 1: Race condition (no synchronization)
-   *****************************************************************/
-  {
-    std::thread t1(increment);
-    std::thread t2(increment);
+  // 1) Create a promise object
+  std::promise<int> prom;
 
-    t1.join();
-    t2.join();
+  // 2) Extract the future from the promise
+  std::future<int> fut = prom.get_future();
 
-    // Result is unpredictable and usually WRONG
-    std::cout << "Final counter (no synchronization): "
-              << counter << std::endl;
-  }
+  // 3) Start a thread and move the promise into it
+  std::thread t(worker, std::move(prom));
 
-  /*****************************************************************
-   * TEST 2: Mutex-protected counter
-   *****************************************************************/
-  {
-    std::thread t1(increment1);
-    std::thread t2(increment1);
+  // 4) Wait for the result (BLOCKING)
+  int value = fut.get();
 
-    t1.join();
-    t2.join();
+  std::cout << "Received value: " << value << std::endl;
 
-    // Result is correct: 200000
-    std::cout << "Final counter1 (with mutex): "
-              << counter1 << std::endl;
-  }
-
-  /*****************************************************************
-   * TEST 3: Atomic counter
-   *****************************************************************/
-  {
-    std::thread t1(increment2);
-    std::thread t2(increment2);
-
-    t1.join();
-    t2.join();
-
-    // load() safely reads the atomic value
-    std::cout << "Final counter2 (with atomic): "
-              << counter2.load() << std::endl;
-  }
-
+  t.join();
   return 0;
 }
 
-// Final counter (no synchronization): 127358
-// Final counter1 (with mutex): 200000
-// Final counter2 (with atomic): 200000
+// Main thread:   fut.get() --------------(waiting)--------------> value
+// Worker thread:      compute ---> set_value()
+
+// Received value: 42
