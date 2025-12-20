@@ -1,100 +1,43 @@
 #include <iostream>
 #include <thread>
 #include <future>
+#include <string>
 
-/********************************************************************
- * CASE 7.1 : packaged_task WITHOUT arguments
- ********************************************************************/
-
-// Function with no parameters
-int task_no_args()
+// Function executed asynchronously
+// Takes two arguments of different types
+// Returns a std::string result
+std::string combine(int x, double y)
 {
-  std::cout << "[task_no_args] Running...\n";
-  return 10;
-}
+  // This line proves that the function
+  // runs in a separate thread when using std::launch::async
+  std::cout << "Executed" << std::endl;
 
-/********************************************************************
- * CASE 7.2 : packaged_task WITH one argument
- ********************************************************************/
-
-// Function with one argument
-int task_one_arg(int x)
-{
-  std::cout << "[task_one_arg] Running with x = " << x << "\n";
-  return x * 2;
-}
-
-/********************************************************************
- * CASE 7.3 : packaged_task WITH multiple arguments (different types)
- ********************************************************************/
-
-// Function with multiple arguments of different types
-double task_multi_args(int a, double b)
-{
-  std::cout << "[task_multi_args] Running with a = "
-            << a << ", b = " << b << "\n";
-  return a + b;
+  // Convert the result of x + y to string and return it
+  return std::to_string(x + y);
 }
 
 int main()
 {
-  /****************************************************************
-   * CASE 7.1 : No arguments
-   ****************************************************************/
-  {
-    // Wrap function inside packaged_task
-    std::packaged_task<int()> task(task_no_args);
+  // std::async creates a TASK (not just a thread)
+  // std::launch::async forces execution in a new thread immediately
+  // combine(3, 4.5) will start running in parallel
+  std::future<std::string> f =
+      std::async(std::launch::async, combine, 3, 4.5);
 
-    // Get future associated with the task
-    std::future<int> result = task.get_future();
+  // This line executes immediately
+  // It may appear before or after "Executed"
+  // depending on thread scheduling
+  std::cout << "Before get() " << std::endl;
 
-    // Run task in a separate thread
-    std::thread t(std::move(task));
-
-    // Wait for result
-    std::cout << "Result (no args): " << result.get() << "\n";
-
-    t.join();
-  }
-
-  /****************************************************************
-   * CASE 7.2 : One argument
-   ****************************************************************/
-  {
-    // packaged_task signature must match function signature
-    std::packaged_task<int(int)> task(task_one_arg);
-
-    std::future<int> result = task.get_future();
-
-    // Arguments are passed when thread starts
-    std::thread t(std::move(task), 5);
-
-    std::cout << "Result (one arg): " << result.get() << "\n";
-
-    t.join();
-  }
-
-  /****************************************************************
-   * CASE 7.3 : Multiple arguments (different types)
-   ****************************************************************/
-  {
-    std::packaged_task<double(int, double)> task(task_multi_args);
-
-    std::future<double> result = task.get_future();
-
-    std::thread t(std::move(task), 3, 4.5);
-
-    std::cout << "Result (multi args): " << result.get() << "\n";
-
-    t.join();
-  }
+  // f.get():
+  // - Blocks until the async task finishes
+  // - Retrieves the returned value from combine()
+  // - Transfers ownership of the result
+  std::cout << f.get() << std::endl; // Expected output: "7.500000"
 
   return 0;
 }
 
-// Result (no args): [task_no_args] Running...
-// 10
-// Result (one arg): [task_one_arg] Running with x = 5
-// 10
-// Result (multi args): [task_multi_args] Running with a = 3, b = 4.5
-// 7.5
+// Before get()
+// Executed
+// 7.500000
