@@ -1,21 +1,21 @@
-
 #include <fstream>
 #include <iostream>
 
 int main()
 {
-  // Open file for writing (will overwrite existing content)
-  std::fstream file("D:\\Mahmood Reda\\C++Learning-Lab\\log.txt", std::ios::out);
-  if (!file.is_open())
+  std::fstream f1("D:\\Mahmood Reda\\C++Learning-Lab\\log.txt", std::ios::in);
+  if (!f1.is_open())
   {
-    std::cerr << "Failed to open file" << std::endl;
+    std::cerr << "Open failed\n";
     return 1;
   }
 
-  // Write text to file
-  file << "Hello, C++ FileSystem!" << std::endl;
-  file << "This is the second line." << std::endl;
+  std::fstream f2 = std::move(f1);
 
-  file.close();
+  std::cout << "f1 is open: " << f1.is_open() << std::endl;
+  std::cout << "f2 is open: " << f2.is_open() << std::endl;
+
   return 0;
 }
+// f1 is open: 0
+// f2 is open: 1
