@@ -1,31 +1,21 @@
+
 #include <fstream>
 #include <iostream>
 
 int main()
 {
-  // Open file for reading
-  std::fstream file1("D:\\Mahmood Reda\\C++Learning-Lab\\log.txt", std::ios::in);
-  if (file1.is_open())
+  // Open file for writing (will overwrite existing content)
+  std::fstream file("D:\\Mahmood Reda\\C++Learning-Lab\\log.txt", std::ios::out);
+  if (!file.is_open())
   {
-    std::cout << "File opened for reading." << std::endl;
-  }
-  else
-  {
-    std::cerr << "Failed to open file." << std::endl;
+    std::cerr << "Failed to open file" << std::endl;
     return 1;
   }
 
-  // Read the first line from the file
-  std::string line;
-  std::getline(file1, line);
-  std::cout << "First line: " << line << std::endl;
+  // Write text to file
+  file << "Hello, C++ FileSystem!" << std::endl;
+  file << "This is the second line." << std::endl;
 
-  // Close the file
-  file1.close();
-  if (!file1.is_open())
-  {
-    std::cout << "File closed successfully." << std::endl;
-  }
-
+  file.close();
   return 0;
 }
