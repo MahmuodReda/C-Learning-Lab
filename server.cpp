@@ -1,21 +1,155 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
-#include <functional>
-#include <cwchar>
-#include <algorithm>
-#include <iterator>
-#include <string>
-#include <cstring>
-#include <psdk_inc/_wsadata.h>
-#include <minwindef.h>
-#include <psdk_inc/_socket_types.h>
-#include <psdk_inc/_ip_types.h>
-#include <inaddr.h>
-#include <c++/15.2.0/bits/basic_string.h>
-#include <c++/15.2.0/bits/ranges_base.h>
-#include <cstdlib>
-int main()
+
+/**
+ * @brief Handle commands based on the requested path
+ *
+ * @param path
+ * @param clientSocket
+ * @param i
+ */
+void handleCommand(const std::string &path, const SOCKET &clientSocket, bool &i)
+
+{
+    if (path == "/open/calc")
+    {
+        int status = system("calc");
+        std::cout << "Calculator open status: " << status << std::endl;
+        if (status == 0)
+        {
+            const char *body =
+                "Hallo from C++20 Server\r\n"
+                "Calculator is open \r\n";
+
+            std::string response =
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/plain\r\n"
+                "Content-Length: " +
+                std::to_string(strlen(body)) + "\r\n"
+                                               "\r\n" +
+                std::string(body);
+
+            send(clientSocket, response.c_str(), response.size(), 0);
+        }
+        else
+        {
+            const char *body =
+                "Hallo from C++20 Server\r\n"
+                "Failed to open Calculator \r\n";
+
+            std::string response =
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/plain\r\n"
+                "Content-Length: " +
+                std::to_string(strlen(body)) + "\r\n"
+                                               "\r\n" +
+                std::string(body);
+
+            send(clientSocket, response.c_str(), response.size(), 0);
+        }
+    }
+    if (path == "/open/notepad")
+    {
+        int status = system("notepad");
+        std::cout << "Notepad open status: " << status << std::endl;
+        if (status == 0)
+        {
+            const char *body =
+                "Hallo from C++20 Server\r\n"
+                "Notepad is open \r\n";
+
+            std::string response =
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/plain\r\n"
+                "Content-Length: " +
+                std::to_string(strlen(body)) + "\r\n"
+                                               "\r\n" +
+                std::string(body);
+
+            send(clientSocket, response.c_str(), response.size(), 0);
+        }
+        else
+        {
+            const char *body =
+                "Hallo from C++20 Server\r\n"
+                "Failed to open Notepad \r\n";
+
+            std::string response =
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/plain\r\n"
+                "Content-Length: " +
+                std::to_string(strlen(body)) + "\r\n"
+                                               "\r\n" +
+                std::string(body);
+
+            send(clientSocket, response.c_str(), response.size(), 0);
+        }
+    }
+    if (path == "/open/chrome")
+    {
+        int status = system("\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\"");
+        std::cout << "Browser open status: " << status << std::endl;
+        if (status == 0)
+        {
+            const char *body =
+                "Hallo from C++20 Server\r\n"
+                "Browser is open \r\n";
+
+            std::string response =
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/plain\r\n"
+                "Content-Length: " +
+                std::to_string(strlen(body)) + "\r\n"
+                                               "\r\n" +
+                std::string(body);
+
+            send(clientSocket, response.c_str(), response.size(), 0);
+        }
+        else
+        {
+            const char *body =
+                "Hallo from C++20 Server\r\n"
+                "Failed to open Browser \r\n";
+
+            std::string response =
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/plain\r\n"
+                "Content-Length: " +
+                std::to_string(strlen(body)) + "\r\n"
+                                               "\r\n" +
+                std::string(body);
+
+            send(clientSocket, response.c_str(), response.size(), 0);
+        }
+    }
+
+    if (path == "/close/server")
+    {
+
+        std::cout << "close server (Bis bald)" << std::endl;
+        i = false;
+
+        const char *body =
+            "Close server (Bis bald)\r\n"
+            "(Mahmoud Reda)\r\n";
+
+        std::string response =
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain\r\n"
+            "Content-Length: " +
+            std::to_string(strlen(body)) + "\r\n"
+                                           "\r\n" +
+            std::string(body);
+
+        send(clientSocket, response.c_str(), response.size(), 0);
+    }
+}
+/**
+ * @brief Initialize and run the server
+ *
+ */
+void server_init(SOCKET &serverSockett)
 {
     std::cout << "Server starting...\n";
 
@@ -24,16 +158,16 @@ int main()
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
         std::cerr << "WSAStartup failed\n";
-        return 1;
     }
 
     // 2) Create socket
     SOCKET serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+    serverSockett = serverSocket;
     if (serverSocket == INVALID_SOCKET)
     {
         std::cerr << "Socket creation failed\n";
         WSACleanup();
-        return 1;
     }
 
     // 3) address setup
@@ -48,7 +182,6 @@ int main()
         std::cerr << "Bind failed\n";
         closesocket(serverSocket);
         WSACleanup();
-        return 1;
     }
 
     // 5) listen
@@ -57,14 +190,19 @@ int main()
         std::cerr << "Listen failed\n";
         closesocket(serverSocket);
         WSACleanup();
-        return 1;
     }
 
     std::cout << "Server listening on port 5000...\n";
-    std::cout << "Client connected!\n";
-    int i = 0;
-    while (i != 10)
-
+}
+/**
+ * @brief server loop to accept and handle client requests
+ *
+ * @param serverSocket
+ */
+void serverloop(SOCKET &serverSocket)
+{
+    bool i = true;
+    while (i != false)
     {
 
         // 6) accept
@@ -74,7 +212,6 @@ int main()
             std::cerr << "Accept failed\n";
             closesocket(serverSocket);
             WSACleanup();
-            return 1;
         }
 
         // 7) recv
@@ -94,44 +231,7 @@ int main()
             std::string path = buffer.substr(start, end - start);
             std::cout << path << std::endl;
 
-            if (path == "/open/calc")
-            {
-                const char *body =
-                    "Hallo from C++20 Server\r\n"
-                    "(Mahmoud Reda)\r\n";
-
-                std::string response =
-                    "HTTP/1.1 200 OK\r\n"
-                    "Content-Type: text/plain\r\n"
-                    "Content-Length: " +
-                    std::to_string(strlen(body)) + "\r\n"
-                                                   "\r\n" +
-                    std::string(body);
-
-                send(clientSocket, response.c_str(), response.size(), 0);
-
-                // system("calc");
-            }
-            if (path == "/close/server")
-            {
-
-                std::cout << "close server (Bis bald)" << std::endl;
-                i = 10;
-
-                const char *body =
-                    "Close server (Bis bald)\r\n"
-                    "(Mahmoud Reda)\r\n";
-
-                std::string response =
-                    "HTTP/1.1 200 OK\r\n"
-                    "Content-Type: text/plain\r\n"
-                    "Content-Length: " +
-                    std::to_string(strlen(body)) + "\r\n"
-                                                   "\r\n" +
-                    std::string(body);
-
-                send(clientSocket, response.c_str(), response.size(), 0);
-            }
+            handleCommand(path, clientSocket, i);
         }
         else
         {
@@ -141,14 +241,62 @@ int main()
         // 8) cleanup
         closesocket(clientSocket);
     }
+}
+
+/**
+ * @brief Cleanup server resources
+ *
+ * @param serverSocket
+ */
+void server_cleanup(SOCKET &serverSocket)
+{
     closesocket(serverSocket);
     WSACleanup();
+}
+
+int main()
+{
+    // Server socket declaration
+    SOCKET serverSocket;
+
+    // Initialize and start the server
+    server_init(serverSocket);
+
+    // Run the server loop to handle client requests
+    serverloop(serverSocket);
+
+    // Cleanup server resources
+    server_cleanup(serverSocket);
+
     return 0;
 }
 
 // Server starting...
 // Server listening on port 5000...
-// Client connected!
+// ----- RAW HTTP REQUEST -----
+// GET /open/notepad HTTP/1.1
+// cache-control: no-store
+// accept: */*
+// user-agent: Teste Android/7.6.12(800)
+// Host: 192.168.1.7:5000
+// Connection: Keep-Alive
+// Accept-Encoding: gzip
+
+// ----------------------------
+// /open/notepad
+// Notepad open status: 0
+// ----- RAW HTTP REQUEST -----
+// GET /open/chrome HTTP/1.1
+// cache-control: no-store
+// accept: */*
+// user-agent: Teste Android/7.6.12(800)
+// Host: 192.168.1.7:5000
+// Connection: Keep-Alive
+// Accept-Encoding: gzip
+
+// ----------------------------
+// /open/chrome
+// Browser open status: 0
 // ----- RAW HTTP REQUEST -----
 // GET /open/calc HTTP/1.1
 // cache-control: no-store
@@ -160,50 +308,7 @@ int main()
 
 // ----------------------------
 // /open/calc
-// ----- RAW HTTP REQUEST -----
-// GET /open/calc HTTP/1.1
-// cache-control: no-store
-// accept: */*
-// user-agent: Teste Android/7.6.12(800)
-// Host: 192.168.1.7:5000
-// Connection: Keep-Alive
-// Accept-Encoding: gzip
-
-// ----------------------------
-// /open/calc
-// ----- RAW HTTP REQUEST -----
-// GET /open/calc HTTP/1.1
-// cache-control: no-store
-// accept: */*
-// user-agent: Teste Android/7.6.12(800)
-// Host: 192.168.1.7:5000
-// Connection: Keep-Alive
-// Accept-Encoding: gzip
-
-// ----------------------------
-// /open/calc
-// ----- RAW HTTP REQUEST -----
-// GET /open/calc HTTP/1.1
-// cache-control: no-store
-// accept: */*
-// user-agent: Teste Android/7.6.12(800)
-// Host: 192.168.1.7:5000
-// Connection: Keep-Alive
-// Accept-Encoding: gzip
-
-// ----------------------------
-// /open/calc
-// ----- RAW HTTP REQUEST -----
-// GET /open/calc HTTP/1.1
-// cache-control: no-store
-// accept: */*
-// user-agent: Teste Android/7.6.12(800)
-// Host: 192.168.1.7:5000
-// Connection: Keep-Alive
-// Accept-Encoding: gzip
-
-// ----------------------------
-// /open/calc
+// Calculator open status: 0
 // ----- RAW HTTP REQUEST -----
 // GET /close/server HTTP/1.1
 // cache-control: no-store
@@ -213,7 +318,6 @@ int main()
 // Connection: Keep-Alive
 // Accept-Encoding: gzip
 
-// U╝☺
 // ----------------------------
 // /close/server
 // close server (Bis bald)
