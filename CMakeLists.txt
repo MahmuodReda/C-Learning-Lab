@@ -29,14 +29,13 @@ target_include_directories(Sec_Files PUBLIC ${PROJECT_BINARY_DIR})
 # Link the executable with the library
 target_link_libraries(Sec_Files PUBLIC wifi_lib)
 
-# 5- let's open CMAKE Cache
-option(Var "BOOL Var" TRUE)
-set(Var2 TRUE CACHE BOOL "bool variable")
-message("Cache is ${Var2}")
+# Set output name for the executable
+install(FILES "${PROJECT_BINARY_DIR}/Sec_Files.exe"
+    DESTINATION "${PROJECT_BINARY_DIR}/executable"
+)
 
-# this variable in CMakeCache.txt 
-# //BOOL Var
-# Var:BOOL=ON
-
-# //bool variable
-# Var2:BOOL=TRUE
+install(FILES
+    "${CMAKE_SOURCE_DIR}/lib/Wifi.hpp"
+    "${CMAKE_SOURCE_DIR}/include/calc.hpp"
+    DESTINATION "${PROJECT_BINARY_DIR}/Include"
+)
