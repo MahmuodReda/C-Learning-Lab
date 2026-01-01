@@ -29,13 +29,17 @@ target_include_directories(Sec_Files PUBLIC ${PROJECT_BINARY_DIR})
 # Link the executable with the library
 target_link_libraries(Sec_Files PUBLIC wifi_lib)
 
-# Set output name for the executable
-install(FILES "${PROJECT_BINARY_DIR}/Sec_Files.exe"
-    DESTINATION "${PROJECT_BINARY_DIR}/executable"
-)
+#1- File
+# FILE(READ "main.cpp" MAIN_Text)
+# Message("${MAIN_Text}")
+# FILE(STRINGS "main.cpp" MAIN_Text)
+# Message("${MAIN_Text}")
+# FILE(STRINGS "main.cpp" MAIN_Text REGEX "^Ke")
+# Message("${MAIN_Text}")
+# file(GLOB_RECURSE SRCS "*.cpp")
+# Message("${SRCS}")
 
-install(FILES
-    "${CMAKE_SOURCE_DIR}/lib/Wifi.hpp"
-    "${CMAKE_SOURCE_DIR}/include/calc.hpp"
-    DESTINATION "${PROJECT_BINARY_DIR}/Include"
-)
+# #2-String
+# FILE(READ "main.cpp" MAIN_Text)
+# STRING(REGEX REPLACE "int" "void" OUT "${MAIN_Text}")
+# Message("${OUT}")
