@@ -47,7 +47,15 @@ foreach(R IN ITEMS M A H M O U D)
 
     message(STATUS "${R}")
     
-endforeach(R IN Items)
+endforeach(R IN ITEMS)
+set (var 10)
+while(${var} LESS_EQUAL  20)
+
+    message(STATUS "Var is ${var}")
+    math(EXPR var "${var} + 1")
+    
+endwhile()
+  
 
 set(PRODUCT_YEAR "2025")
 set(HELLOAPP_VERSION_MAJOR 1)
@@ -58,3 +66,24 @@ target_include_directories(Sec_Files PUBLIC ${PROJECT_BINARY_DIR})
 
 # Link the executable with the library
 target_link_libraries(Sec_Files PUBLIC wifi_lib)
+
+
+# -- Debug mode is ON
+# -- M
+# -- A
+# -- H
+# -- M
+# -- O
+# -- U
+# -- D
+# -- Var is 10
+# -- Var is 11
+# -- Var is 12
+# -- Var is 13
+# -- Var is 14
+# -- Var is 15
+# -- Var is 16
+# -- Var is 17
+# -- Var is 18
+# -- Var is 19
+# -- Var is 20
