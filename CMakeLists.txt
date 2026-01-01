@@ -43,6 +43,11 @@ if(DEBUG)
     message(STATUS "${DEBUGINFO}")
 endif()
 
+foreach(R IN ITEMS M A H M O U D)
+
+    message(STATUS "${R}")
+    
+endforeach(R IN Items)
 
 set(PRODUCT_YEAR "2025")
 set(HELLOAPP_VERSION_MAJOR 1)
