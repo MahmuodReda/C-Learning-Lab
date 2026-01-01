@@ -37,6 +37,12 @@ target_include_directories(Sec_Files PUBLIC
     include/   # Project headers
     lib/       # Library headers
 )
+set(DEBUG "1")
+if(DEBUG)
+    set(DEBUGINFO "Debug mode is ON")
+    message(STATUS "${DEBUGINFO}")
+endif()
+
 
 set(PRODUCT_YEAR "2025")
 set(HELLOAPP_VERSION_MAJOR 1)
