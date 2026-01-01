@@ -29,12 +29,14 @@ target_include_directories(Sec_Files PUBLIC ${PROJECT_BINARY_DIR})
 # Link the executable with the library
 target_link_libraries(Sec_Files PUBLIC wifi_lib)
 
-function(happynewyear arg1)
-    message ("ARG1 ${arg1}") #name of variable
-    message ("ARG1 ${ARG1}") #show values of list
-    message ("ARG1 ${ARGN}") #extra argument
-    message ("ARG1 ${ARGC}") # count
-endfunction()
+# 5- let's open CMAKE Cache
+option(Var "BOOL Var" TRUE)
+set(Var2 TRUE CACHE BOOL "bool variable")
+message("Cache is ${Var2}")
 
-set(var 2 2 2 )
-happynewyear(var jan)
+# this variable in CMakeCache.txt 
+# //BOOL Var
+# Var:BOOL=ON
+
+# //bool variable
+# Var2:BOOL=TRUE
